@@ -16,12 +16,39 @@ $$
 $$
 Denote $$x_j=a+jh, j=0,1,...,N,$$ where $h=\frac{b-a}{N}$. The energy functional can be discretized as 
 $$
-	E(\rho) = h\sum_{j=0}^{N-1} \left[ \frac{|\delta_x^s \rho_j|^2}{\rho_j+\varepsilon} + V(x) \rho_j + \frac{\beta}{2}\rho_j^2 + \frac{\delta}{2}|\delta_x^s \rho_j|^2\right],
+	E_h(\rho) = h\sum_{j=0}^{N-1} \left[ \frac{|\delta_x^s \rho_j|^2}{\rho_j+\varepsilon} + V(x_j) \rho_j + \frac{\beta}{2}\rho_j^2 + \frac{\delta}{2}|\delta_x^s \rho_j|^2\right],
 $$
-where $\rho_j$ is the approximation of $\rho(x_j)$, satisfying the periodic boundary condition, and $\delta_x^s \rho_j$ is the pseudospectral approximation of $\nabla \rho(x_j)$. If we denote the vector $\rho = (\rho_0,\rho_1, \cdots, \rho_{N-1})$ (Latex `\boldsymbol{\rho}`) 
-then 
+where $\rho_j=\rho(x_j)$, satisfying the periodic boundary condition, and $\delta_x^s \rho_j$ is the pseudospectral approximation of $\nabla \rho(x_j)$. 
+We aim to find $\rho_g\in S_N^+$ such that 
 $$
-	\boldsymbol{\rho}
+	\rho_g = {argmin}_{\rho \in S_N^+} E_h(\rho), 
 $$
+where the discrete function space $S_N^+$ is defined as  
+$$
+	S_N^+ := span\{\Phi_l(x) = e^{i\frac{2\pi l(x-a)}{b-a}}, l = 0,1,2,\cdots, N-1 \} \cap \{ f(x) : f(x_j) \ge 0, j = 0,1,2,\cdots, N-1 \}.
+$$
+Here we do not force $\rho_g(x)$ to be positive over $[a,b]$. Instead, we only require $\rho_g(x)$ to be positive on the grids.
+
+### Details of the pseudospectral discretization
+For simplicity of notations, we use $\mu_l =\frac{2\pi l}{b-a}$. Since 
+$$
+	\rho(x) \approx \sum_{l=-\frac{N}{2}}^{\frac{N}{2}-1} \hat{\rho}_l e^{i\frac{2\pi l(x-a)}{b-a}} = \sum_{l=-\frac{N}{2}}^{\frac{N}{2}-1} \hat{\rho}_l e^{i\mu_l(x-a)}，
+$$
+the first derivatives at grid points can be computed as 
+$$
+	\frac{d \rho}{dx}(x) \approx \delta_x^s \rho := \sum_{l=-\frac{N}{2}}^{\frac{N}{2}-1} i\mu_l\hat{\rho}_l e^{i\mu_l(x_j-a)}
+	= \sum_{l=-\frac{N}{2}}^{\frac{N}{2}-1} i\mu_l\hat{\rho}_l e^{i \frac{2\pi l j}{N}}.
+$$
+At grid points, 
+
+#### Relations via Matrices
+* $\rho = F$
+ 
+
+### Details of 
 
 
+
+### Future work
+
+1. Bad behavior for small $\varepsilon$: new regularization / JKO (possible? uniformly effective)
