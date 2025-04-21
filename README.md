@@ -12,11 +12,11 @@ Optimization of Energy Functionals Based on Regularized Density Formulations
 ### Discrete energy functional
 For 1D case, we consider the energy functional 
 $$
-	E(\rho) = \int_a^b \left[ \frac{|\nabla \rho|^2}{\rho+\varepsilon} + V(x) \rho + \frac{\beta}{2}\rho^2 + \frac{\delta}{2}|\nabla\rho|^2\right]dx, x\in[a,b].
+	E(\rho) = \int_a^b \left[ \frac{|\nabla \rho|^2}{8(\rho+\varepsilon)} + V(x) \rho + \frac{\beta}{2}\rho^2 + \frac{\delta}{2}|\nabla\rho|^2\right]dx, x\in[a,b].
 $$
 Denote $$x_j=a+jh, j=0,1,...,N,$$ where $h=\frac{b-a}{N}$. The energy functional can be discretized as 
 $$
-	E_h(\rho) = h\sum_{j=0}^{N-1} \left[ \frac{|\delta_x^s \rho_j|^2}{\rho_j+\varepsilon} + V(x_j) \rho_j + \frac{\beta}{2}\rho_j^2 + \frac{\delta}{2}|\delta_x^s \rho_j|^2\right],
+	E_h(\rho) = h\sum_{j=0}^{N-1} \left[ \frac{|\delta_x^s \rho_j|^2}{8(\rho_j+\varepsilon)} + V(x_j) \rho_j + \frac{\beta}{2}\rho_j^2 + \frac{\delta}{2}|\delta_x^s \rho_j|^2\right],
 $$
 where $\rho_j=\rho(x_j)$, satisfying the periodic boundary condition, and $\delta_x^s \rho_j$ is the pseudospectral approximation of $\nabla \rho(x_j)$. 
 We aim to find $\rho_g\in S_N^+$ such that 
@@ -59,20 +59,21 @@ $$
 	\hat{\rho}_{N-k} = \frac{1}{N} \sum_{j=0}^{N-1} \rho_j e^{-i \frac{2\pi j(N-k)}{N}} = \frac{1}{N} \sum_{j=0}^{N-1} \rho_j e^{i \frac{2\pi jk}{N}} = \overline{\hat{\rho}}_k.
 $$
 
-**Corollary 1**: $\hat{\rho}_{-\frac{N}{2}} = \hat{\rho}_{\frac{N}{2}} \in \mathbb{R}$, $i\mu_{-\frac{N}{2}}\hat{\rho}_{-\frac{N}{2}} e^{-i \pi j} = i\mu_{-\frac{N}{2}}\hat{\rho}_{-\frac{N}{2}}(-1)^j$ is a pure imaginary number.
+**Corollary 1**: $\hat{\rho}_{-\frac{N}{2}} = \hat{\rho}_{\frac{N}{2}} \in \mathbb{R}$.
 
 **Proposition 2**: $Re(\delta_x^s \rho_j) = \sum_{l=-\frac{N}{2}+1}^{\frac{N}{2}-1} i\mu_l\hat{\rho}_l e^{i \frac{2\pi l j}{N}}$, $Im(\delta_x^s \rho_j) = i\mu_{-\frac{N}{2}}\hat{\rho}_{-\frac{N}{2}} e^{-i \pi j} = i\mu_{-\frac{N}{2}}\hat{\rho}_{-\frac{N}{2}}(-1)^j$
 
-**proof**: For $k\neq -\frac{N}{2}$, 
+**proof**: For $k = -\frac{N}{2}$, $i\mu_{-\frac{N}{2}}\hat{\rho}_{-\frac{N}{2}} e^{-i \pi j} = i\mu_{-\frac{N}{2}}\hat{\rho}_{-\frac{N}{2}}(-1)^j$ is a pure imaginary number.
+For $k\neq -\frac{N}{2}$, 
 $$
 	i\mu_k \hat{\rho}_k e^{i \frac{2\pi k j}{N}} + i\mu_{-k} \hat{\rho}_{-k} e^{i \frac{-2\pi k j}{N}} = i\mu_k (\hat{\rho}_k e^{i \frac{2\pi k j}{N}} - \overline{\hat{\rho}_{k} e^{i \frac{2\pi k j}{N}}}) \in \mathbb{R},
 $$
-where the periodicity and Proposition 1 are applied. Therefore, $ \sum_{l=-\frac{N}{2}+1}^{\frac{N}{2}-1} i\mu_l\hat{\rho}_l e^{i \frac{2\pi l j}{N}} \in \mathbb{R}$. By corollary, for $k= -\frac{N}{2}$, the pure imaginary. The conclusion follows immediately.
+where the periodicity and Proposition 1 are applied. Therefore, $ \sum_{l=-\frac{N}{2}+1}^{\frac{N}{2}-1} i\mu_l\hat{\rho}_l e^{i \frac{2\pi l j}{N}} \in \mathbb{R}$. 
 
 **As a remark, in practice we only need to take the real part for computing $\delta_x^s \rho_j$.**
 
 #### Relations via Matrices
-The above relations can be described by using matrices. Define the diagonal matrix $D= \text{diag}\{i\mu_0, i\mu_1, \cdots, i\mu_{\frac{N}{2}-1}, i\mu_{-\frac{N}{2}}, i\mu_{-\frac{N}{2}+1}, \cdots, i\mu_{-1}\}$ and the symmetric matrix $F=(F_{j,k})\in\mathbb{R}^{N\times N}$, where 
+The above relations can be described by using matrices. Define the diagonal matrix $\Lambda= \text{diag}\{i\mu_0, i\mu_1, \cdots, i\mu_{\frac{N}{2}-1}, i\mu_{-\frac{N}{2}}, i\mu_{-\frac{N}{2}+1}, \cdots, i\mu_{-1}\}$ and the symmetric matrix $F=(F_{j,k})\in\mathbb{R}^{N\times N}$, where 
 $$
 	F_{j,k} = e^{i\frac{2\pi jk}{N}},
 $$
@@ -82,14 +83,44 @@ and define the vectors $\rho = (\rho_0, \rho_1, \cdots, \rho_{N-1})^T$ and $\hat
 | ------- | ---------  |
 |$\rho = F \hat{\rho}$| `rho = N * ifft(Frho)`|
 |$\hat{\rho} = F^{-1} \rho = \frac{1}{N} \overline{F} \rho$ | `Frho = 1 / N * fft(rho)`|
-|$\delta_x^s \rho = \frac{1}{N} F D\overline{F}\rho$ | `Frho = fft(rho);`<br>`Fdrho = D * Frho;`<br>`drho = real(ifft(Frho));`|
-
+|$\delta_x^s \rho = D\rho$ | `Frho = fft(rho);`<br>`Fdrho = Lambda * Frho;`<br>`drho = real(ifft(Frho));`|
+| $D^T\rho$ | `Frho = ifft(rho);`<br>`Fdrho = Lambda * Frho;`<br>`drho = real(fft(Frho));`|
+where $D = \mathcal{R}(\frac{1}{N} F \Lambda\overline{F}), D^T = \mathcal{R}(\frac{1}{N} \overline{F} \Lambda F)$.
 
  
 
 ### Gradient of the discrete energy functional 
+Vectorization of the energy functional: 
+$$
+	E_h(\rho) = h\sum_{j=0}^{N-1} 
+	\left[
+	\frac{(D\rho)_j^2}{8(\rho_j+\varepsilon)} + V_j\rho_j +\frac{\beta}{2}\rho_j^2 + \frac{\delta}{2} (D\rho)_j^2,
+	\right]
+$$
+where $D = \mathcal{R}(\frac{1}{N} F \Lambda\overline{F})$. A detailed computation shows the partial derivative of each $\rho_i$ as follows
+$$
+	\frac{\partial}{\partial \rho_i} \frac{(D\rho)_j^2}{8(\rho_j+\varepsilon)} 
+	=
+	\frac{(D\rho)_j D_{ji}}{4(\rho_j+\varepsilon)}
+	-\frac{(D\rho)_j^2}{8(\rho_j+\varepsilon)^2}\delta_{ij}
+$$
+$$
+	\frac{\partial}{\partial \rho_i}(V_j\rho_j) = V_j \delta_{ij}
+$$
+$$
+	\frac{\partial}{\partial \rho_i}\left(\frac{\beta}{2}\rho_j^2\right) = \beta \rho_j \delta_{ij}
+$$
+$$
+	\frac{\partial}{\partial \rho_i}\left(\frac{\delta}{2}(D\rho)_j^2\right) = \delta (D\rho)_j D_{ji}.
+$$
+To summarize 
 
-
+| Energy | Gradient | Matlab Code |
+| ------- | ------- | ---------  |
+|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{\rho_j+\varepsilon}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ |
+|$h\sum_{j=0}^{N-1} V_j\rho_j$ | $hV$ | `dE_pot = h * V`|
+|$h\sum_{j=0}^{N-1} \frac{\beta}{2}\rho_j^2$ | $h\beta \rho$ | `dE_beta = h * beta * rho` |
+|$h\sum_{j=0}^{N-1} \frac{\delta}{2} (D\rho)_j^2$ | $h\delta D^T D\rho$ | `dE_delta = h * delta * ` |
 
 ### Future work
 
