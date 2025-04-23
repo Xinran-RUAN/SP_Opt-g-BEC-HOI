@@ -158,6 +158,17 @@ To summarize
 $$
 	\|\nabla E(x) - \nabla E(y)\| \le L \|x-y\|.
 $$
+**Proof**: We only need to show the Lipschitz continuity of the kinetic energy term. 
+$$
+\begin{aligned}
+	\| D^T\frac{D x}{4(x+\varepsilon)} - D^T\frac{D y}{4(y+\varepsilon)} \| & \le \frac{\|D\|}{4} \left\|  \frac{D x}{x+\varepsilon} - \frac{D y}{y+\varepsilon} \right\| \\
+	& \le \frac{\|D\|}{4} \left(\left\|\frac{Dx - Dy}{x+\varepsilon}\right\| + \left\|Dy \frac{y-x}{(x+\varepsilon)(y+\varepsilon)}\right\|\right)\\
+	& \le \frac{\|D\|}{4} \left(\frac{\|D\|}{\varepsilon}\|y-x\| + \frac{\|Dy\|_\infty}{\varepsilon^2} \|y-x\|\right)\\
+	& \le \frac{\|D\|}{4} \left(\frac{\|D\|}{\varepsilon} + \frac{\|D\|_\infty \|y\|_\infty}{\varepsilon^2} \right)\|y-x\|\\
+	& \le \frac{\|D\|}{4} \left(\frac{\|D\|}{\varepsilon} + \frac{\|D\|_\infty}{h\varepsilon^2} \right)\|y-x\|
+\end{aligned}
+$$
+where $\|D\|_\infty = max_j \sum_{k=1}^N |D_{jk}|$.
 
 ### Future work
 
