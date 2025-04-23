@@ -83,11 +83,26 @@ and define the vectors $\rho = (\rho_0, \rho_1, \cdots, \rho_{N-1})^T$ and $\hat
 | ------- | ---------  |
 |$\rho = F \hat{\rho}$| `rho = N * ifft(Frho)`|
 |$\hat{\rho} = F^{-1} \rho = \frac{1}{N} \overline{F} \rho$ | `Frho = 1 / N * fft(rho)`|
-|$\delta_x^s \rho = D\rho$ | `Frho = fft(rho);`<br>`Fdrho = Lambda * Frho;`<br>`drho = real(ifft(Frho));`|
-| $D^T\rho$ | `Frho = ifft(rho);`<br>`Fdrho = Lambda * Frho;`<br>`drho = real(fft(Frho));`|
-where $D = \mathcal{R}(\frac{1}{N} F \Lambda\overline{F}), D^T = \mathcal{R}(\frac{1}{N} \overline{F} \Lambda F)$.
+|$\delta_x^s \rho = D\rho$ | `drho = fourier_diff(rho, Lambda);`|
+| $D^T\rho$ | `drho_T = fourier_diff_T(rho, Lambda);`|
 
- 
+where $D = \mathcal{R}(\frac{1}{N} F \Lambda\overline{F}), D^T = \mathcal{R}(\frac{1}{N} \overline{F} \Lambda F)$ and 
+
+```Matlab
+function [drho] = fourier_diff(rho, Lambda)
+    Frho = fft(rho);
+    Fdrho = Lambda * Frho;
+    drho = real(ifft(Fdrho));
+end
+```
+
+```Matlab
+function [drho_T] = fourier_diff_T(rho, Lambda)
+    iFrho = ifft(rho);
+    iFdrho = Lambda * iFrho;
+    drho_T = real(fft(iFdrho));
+end
+```
 
 ### Gradient of the discrete energy functional 
 Vectorization of the energy functional: 
@@ -117,10 +132,10 @@ To summarize
 
 | Energy | Gradient | Matlab Code |
 | ------- | ------- | ---------  |
-|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{\rho_j+\varepsilon}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ |
-|$h\sum_{j=0}^{N-1} V_j\rho_j$ | $hV$ | `dE_pot = h * V`|
+|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{\rho_j+\varepsilon}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ | `Drho = fourier_diff(rho, Lambda);` <br> `Grho = Drho ./ (rho + vep);` <br> `DtGrho = fourier_diff_T(Grho, Lambda);` <br> `dE_kin = h * (DtGrho / 4 - Grho.^2 / 8);` |
+|$h\sum_{j=0}^{N-1} V_j\rho_j$ | $hV$ | `dE_pot = h * V;`|
 |$h\sum_{j=0}^{N-1} \frac{\beta}{2}\rho_j^2$ | $h\beta \rho$ | `dE_beta = h * beta * rho` |
-|$h\sum_{j=0}^{N-1} \frac{\delta}{2} (D\rho)_j^2$ | $h\delta D^T D\rho$ | `dE_delta = h * delta * ` |
+|$h\sum_{j=0}^{N-1} \frac{\delta}{2} (D\rho)_j^2$ | $h\delta D^T D\rho$ | `Drho = fourier_diff(rho, Lambda);` <br> `DtDrho = fourier_diff_T(Drho, Lambda);` <br> `dE_delta = h * delta * DtDrho;` |
 
 ### Future work
 
