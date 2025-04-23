@@ -27,7 +27,24 @@ where the discrete function space $S_N^+$ is defined as
 $$
 	S_N^+ := span\{\Phi_l(x) = e^{i\frac{2\pi l(x-a)}{b-a}}, l = 0,1,2,\cdots, N-1 \} \cap \{ f(x) : f(x_j) \ge 0, j = 0,1,2,\cdots, N-1 \}.
 $$
-Here we do not force $\rho_g(x)$ to be positive over $[a,b]$. Instead, we only require $\rho_g(x)$ to be positive on the grids.
+Here we do not force $\rho_g(x)$ to be positive over $[a,b]$. Instead, we only require $\rho_g(x)$ to be positive on the grids. 
+
+**Proposition**: $E_h(\rho)$ is convex in $S_N^+$.
+**Proof**: It is sufficient to prove the convexity of 
+$$
+	E_{kin}(\rho) =  \frac{h}{8}\sum_{j=0}^{N-1} \frac{|\delta_x^s \rho_j|^2}{\rho_j+\varepsilon}.
+$$
+A direct computation shows that 
+$$
+\begin{aligned}
+	\frac{E_{kin}(a) + E_{kin}(b)}{2} & =  \frac{h}{16}\sum_{j=0}^{N-1} \left[\frac{|\delta_x^s a_j|^2}{a_j+\varepsilon} + \frac{|\delta_x^s b_j|^2}{b_j+\varepsilon}\right]\\
+	& = \frac{h}{16}\sum_{j=0}^{N-1} \frac{|\delta_x^s a_j|^2\left(1 + \frac{b_j+\varepsilon}{a_j+\varepsilon}\right) + |\delta_x^s b_j|^2\left(1 + \frac{a_j+\varepsilon}{b_j+\varepsilon}\right)}{a_j + b_j +2\varepsilon}\\
+	& \ge \frac{h}{16}\sum_{j=0}^{N-1} \frac{|\delta_x^s a_j|^2 + 2(\delta_x^s a_j)(\delta_x^s b_j) + |\delta_x^s b_j|^2}{a_j + b_j +2\varepsilon}\\
+	& = \frac{h}{16}\sum_{j=0}^{N-1} \frac{(\delta_x^s a_j + \delta_x^s b_j)^2}{a_j + b_j +2\varepsilon}\\
+	& = \frac{h}{8}\sum_{j=0}^{N-1} \frac{\left(\delta_x^s \frac{a_j+b_j}{2} \right)^2}{\frac{a_j + b_j}{2} + \varepsilon}\\
+	& = E_{kin}\left(\frac{a+b}{2}\right)
+\end{aligned}
+$$
 
 ### Details of the pseudospectral discretization
 For simplicity of notations, we use $\mu_l =\frac{2\pi l}{b-a}$. Since 
@@ -136,6 +153,11 @@ To summarize
 |$h\sum_{j=0}^{N-1} V_j\rho_j$ | $hV$ | `dE_pot = h * V;`|
 |$h\sum_{j=0}^{N-1} \frac{\beta}{2}\rho_j^2$ | $h\beta \rho$ | `dE_beta = h * beta * rho` |
 |$h\sum_{j=0}^{N-1} \frac{\delta}{2} (D\rho)_j^2$ | $h\delta D^T D\rho$ | `Drho = fourier_diff(rho, Lambda);` <br> `DtDrho = fourier_diff_T(Drho, Lambda);` <br> `dE_delta = h * delta * DtDrho;` |
+
+**Proposition**: $\nabla E(\rho)$ is Lipschitz continuous in $\rho$, i.e. 
+$$
+	\|\nabla E(x) - \nabla E(y)\| \le L \|x-y\|.
+$$
 
 ### Future work
 
