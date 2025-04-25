@@ -30,6 +30,7 @@ $$
 Here we do not force $\rho_g(x)$ to be positive over $[a,b]$. Instead, we only require $\rho_g(x)$ to be positive on the grids. 
 
 **Proposition**: $E_h(\rho)$ is convex in $S_N^+$.
+
 **Proof**: It is sufficient to prove the convexity of 
 $$
 	E_{kin}(\rho) =  \frac{h}{8}\sum_{j=0}^{N-1} \frac{|\delta_x^s \rho_j|^2}{\rho_j+\varepsilon}.
