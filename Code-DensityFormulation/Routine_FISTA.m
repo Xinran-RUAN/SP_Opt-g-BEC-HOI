@@ -13,7 +13,7 @@ function [Xc, k] = Routine_FISTA(X, data)
 % 参数设置
 %   L初值为L0，每次以 eta*L0 的速度增大
 %   当 \|X_c-X_o\| < tol 时算法停止，认为近似找到最优解
-L0 = 1;
+L0 = 5 * max(abs(GradObj_Func(X, data)));
 eta = 1.1; 
 tol = 1e-12; 
 %===================================================
@@ -23,18 +23,17 @@ Yc = Xc;
 tc = 1;
 k = 1;
 err_l2 = 1;
+max_iter = 1e5;
 %===================================================
-% h = data.dx;
-while(k==1 || err_l2 > tol)
-    L = L0;
+L = L0; % L似乎只需赋1个初值
+while(k==1 || err_l2 > tol)    
     %===================================================
-    grad_fY = GradObj_Func(Yc, data);
-    Y_prox = pL_Func(Yc - (grad_fY) / L, data);
+    Y_prox = pL_Func(Yc, L, data);
    
     % 使用back-tracking寻找L
-    while(Obj_Func(Y_prox, data) > QL_Approx(Y_prox, Yc, L, data))  
+    while(Obj_Func(Y_prox, data) > QL_Func(Y_prox, Yc, L, data))  
         L = eta * L;
-        Y_prox = pL_Func(Yc - (grad_fY) / L, data);
+        Y_prox = pL_Func(Yc, L, data);
     end
     % update
     Xo = Xc;
@@ -43,6 +42,11 @@ while(k==1 || err_l2 > tol)
     tc = 0.5 * (1 + sqrt(1 + 4 * to^2));
     Yc = Xc + (to - 1) / tc * (Xc - Xo);
     k = k + 1;
-    % 误差计算
-    err_l2 = norm((Xo - Xc).^2 * sqrt(data.dx), 2);
+    % 次数判断
+    if k > max_iter
+        break;
+    end
+    % L2-误差计算    
+    err_l2 = sqrt(data.dx * sum((Xc - Xo).^2));
+    disp(['FISTA:' ,num2str(err_l2), ', L = ', num2str(L)]);
 end

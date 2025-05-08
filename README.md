@@ -172,15 +172,182 @@ $$
 where $\|D\|_\infty = max_j \sum_{k=1}^N |D_{jk}|$.
 
 ## ISTA/FISTA
-**Algorithm 1**: ISTA with constant stepsize
+Key functions used in the algorithm:
+
+*  $Q_L(x, y)$: Quadratic approximation of $f(x)$ defined as (linear approximation with quadratic penalty)
+$$
+	Q_L(x, y) := f(y) + <x - y, \nabla f(y)> + \frac{L}{2}\|x-y\|^2.
+$$
+
+*  $p_L(y)$: Unique minimizer of $Q_L(x,y)$ in the feasible set $S_N^+(1)$, where $S_N^+(1) = S_N^+ \cap \{X\in\mathbb{R}^N \, | \,  h \sum_{i=1}^N X(i)= 1\}$. 
+Simple algebra shows that 
+$$
+	p_L(y) = argmin_{x\in S_N^+(1)} \left\|x - \left(y - \frac{1}{L} \nabla f(y)\right)\right\|.
+$$
+
+**Algorithm 1.1**: ISTA with constant stepsize
+Step k: 
 $$
 	X_k = p_L(X_{k-1})
 $$
-where 
+Here $L$ can be taken as $L(f)$, a Lipschitz constant of $\nabla f$.
+
+**Algorithm 1.2**: ISTA with backtracking
 $$
-	p_L(y) = argmin_{x\in S_N^+(1)} \left\| x - \left(y-\frac{1}{L}\nabla f(y)\right) \right\|
+	L_0 > 0, \, \eta > 1
 $$
-with $S_N^+(1) = S_N^+ \cap \{X\in\mathbb{R}^N \, | \,  h \sum_{i=1}^N X(i)= 1\}$.
+Step k: 
+Find smallest $i_k$ such that with $\overline{L} = \eta^{i_k} L_{k-1}$, 
+$$
+	f(p_{\overline{L}}(X_{k-1})) \le Q_{\overline{L}}(p_{\overline{L}}(X_{k-1}), X_{k-1}).
+$$
+Set $L_k = \overline{L}$ and compute
+$$
+	X_k = p_{L_k}(X_{k-1}).
+$$
+
+**Algorithm 2.1**: FISTA with constant stepsize
+$$
+	Y_1 = X_0, \, t_1 = 1
+$$
+Step k: 
+$$
+\begin{aligned}
+	&X_k = p_L(Y_k)\\
+	&t_{k+1} = \frac{1+\sqrt{1+4t_k^2}}{2}\\
+	&Y_{k+1} = X_k + \left(\frac{t_k-1}{t_{k+1}}\right)(X_k - X_{k-1})
+\end{aligned}
+$$
+
+**Algorithm 2.2**: FISTA with backtracking
+$$
+	L_0 > 0, \, \eta > 1, \, y_1 = x_0, \, t_1 = 1
+$$
+Step k: 
+Find smallest $i_k$ such that with $\overline{L} = \eta^{i_k} L_{k-1}$, 
+$$
+	f(p_{\overline{L}}(Y_{k})) \le Q_{\overline{L}}(p_{\overline{L}}(Y_{k}), Y_{k}).
+$$
+Set $L_k = \overline{L}$ and compute
+$$
+\begin{aligned}
+	&x_k = p_L(y_k)\\
+	&t_{k+1} = \frac{1+\sqrt{1+4t_k^2}}{2}\\
+	&y_{k+1} = x_k + \left(\frac{t_k-1}{t_{k+1}}\right)(x_k - x_{k-1})
+\end{aligned}
+$$
+
+### Convergence analysis
+**Proposition 1**:If $f$ is convex and $\|\nabla f(x) - \nabla f(y) \| \le L_0 \|x - y\|$, then 
+$$
+\begin{aligned}
+	& f(x) \ge f(y) + <x - y, \nabla f(y)> \\
+	& f(x) \le f(y) + <x - y, \nabla f(y)> + \frac{L_0}{2}\|x-y\|^2 = Q(x, y).
+\end{aligned}
+$$
+**Proof**: We only show the second inequality here.
+$$
+\begin{aligned}
+	f(x) - f(y) - <x - y, \nabla f(y)> &= \int_0^1 <\nabla f(y+t(x-y)) - \nabla f(y), x-y> dt \\
+	& \le L_0 \int_0^1 t \|x-y\|^2 dt \\
+	& = \frac{L_0}{2} \|x-y\|^2.
+\end{aligned}
+$$
+
+**Proposition 2**: For any $x \in \mathbb{R}^N,y \in S_N^+(1)$, if 
+$$
+	f(p_L(y)) \le Q(p_L(y), y) = f(y) + <p_L(y) - y, \nabla f(y)> + \frac{L}{2}\|p_L(y)-y\|^2,
+$$
+then 
+$$
+	F(x) - F(p_L(y)) \ge \frac{L}{2} \|p_L(y)-y\|^2 + L<y-x, p_L(y)-y>, 
+$$
+where $F(x) := f(x) + \mathbb{I}_{S_N^+(1)}(x)$.
+**Proof**: If $x\notin S_N^+(1)$, then $F(x)=+\infty$ and the inequality is trivial. 
+If $x\in S_N^+(1)$, then
+$$
+\begin{aligned}
+	F(x) - F(p_L(y)) & = f(x) - f(p_L(y)) \\
+	& \ge f(x) - f(y) - <p_L(y) - y, \nabla f(y)> - \frac{L}{2}\|p_L(y)-y\|^2 \\
+	& \ge <x - p_L(y), \nabla f(y)> - \frac{L}{2}\|p_L(y)-y\|^2 .
+\end{aligned}
+$$
+
+If $y - \frac{1}{L} \nabla f(y) \in S_N^+(1)$, then 
+$$
+	p_L(y) = y - \frac{1}{L} \nabla f(y)
+$$
+and therefore
+$$
+	\nabla f(y) = L(y - p_L(y)).
+$$
+By substitution, we get
+$$
+\begin{aligned}
+	f(x) - f(p_L(y)) &\ge L<x - p_L(y), y - p_L(y)> - \frac{L}{2}\|p_L(y)-y\|^2 \\
+	& = \frac{L}{2} \|p_L(y)-y\|^2 + L<y-x, p_L(y)-y>.
+\end{aligned}
+$$
+
+If $y - \frac{1}{L} \nabla f(y) \notin S_N^+(1)$, by definition of $p_L(y)$, we have 
+$$
+	\left\|x -\left( y - \frac{1}{L}\nabla f(y)\right)\right\| \ge  \left\|p_L(y) -\left( y - \frac{1}{L}\nabla f(y)\right)\right\|,
+$$
+which implies 
+$$
+	<x-p_L(y), \nabla f(y)> \, \ge \frac{L}{2}\|p_L(y)-y\|^2 - \frac{L}{2}\|x-y\|^2 
+$$
+_**Fails!**_
+
+**Lemma**: If $x^*$ is a local minimizer of $f(x)$ in $\Omega$, then we must have
+$$
+	-\nabla f \in N_\Omega(x^*),
+$$
+where $N_\Omega(x^*)$ is the normal cone defined as 
+$$
+	N_\Omega(x) = \{ v \, | \, v^Tw \le 0, \forall w \in T_\Omega(x) \}.
+$$
+Here $T_\Omega(x)$ is the tangent cone, the set of all tangents at $x$. We say $d$ is a tangent at $x$ if there exist $\{z_k\}\to x$ and $\{t_k\}\to0$ such that 
+$\lim_{k\to\infty} \frac{z_k-x}{t_k} = d$. 
+
+With the above lemma, noticing the definition of $p_L(y)$, we must have 
+$$
+	p_L(y) - \left(y-\frac{1}{L} \nabla f(y)\right) \in N_\Omega(p_L(y)).
+$$
+Here $\Omega = S_N^+(1)$ is the feasible set. Define 
+$$
+	\gamma = -\nabla f(y) + L(y - p_L(y)),
+$$
+then 
+$$
+	<\gamma, w> \le 0, \, \forall w\in T_\Omega(p_L(y)).
+$$
+It is easy to check that for all $x\in\Omega$, $x-p_L(y) \in T_\Omega(p_L(y))$, which implies 
+$$
+	<x-p_L(y), \gamma> \le 0.
+$$
+Then 
+$$
+\begin{aligned}
+	f(x) - f(p_L(y)) \ge f(x) - f(p_L(y)) + <x-p_L(y), \gamma> \\
+\end{aligned}
+$$
+
+
+## Numerical Test
+$V(x)=\frac{x^2}{2}$, $\beta = 10$, $\delta = 10$, $h_0=1/2$
+
+|   | $h=h_0$ |$h = h_0/2$|$h=h_0/4$|$h=h_0/8$| $h = 10^{-3}$|
+|-------|-------|-------|-------|-------|-------|
+| $\varepsilon = 10^{-4}$ | 2.228056825443657 | 2.228060264817093 |2.228060336933893 | 2.228060335770537
+| $\varepsilon = 10^{-3}$ | 2.204129497462118 | 2.204062679240165 | 2.204062800910641 | 2.204062789539389 | 2.204062787481187|
+
+We take the solution with $h=10^{-3}$ as the exact solution.
+
+|  $\varepsilon = 10^{-3}$   | $h=h_0$ |$h = h_0/2$|$h=h_0/4$|$h=h_0/8$| 
+|-------|-------|-------|-------|-------|
+| $Abs(E(\rho)-E(\rho_{ex}))$ | 6.67E-5 | 1.08E-7 | 1.34E-8 | 2.06E-9 |
+| L2-norm | 3.87E-3 | 1.02E-3 | 2.52E-4 | 5.91E-5 |
 
 ## Future work
 

@@ -9,17 +9,17 @@ tic;    % 计时开始
 % ============================================================
 % 初始化data参数
 data.beta = 1e1;
-data.delta = 1e2;
-data.vep = 1e-4; 
+data.delta = 1e1;
+data.vep = 1e-3; 
 % 计算区域
 Lx = 16;
-data.dx = 1 / 2^3;
+data.dx = 10^(-3);
 data.xmax = Lx;
 data.xmin = -Lx;
 data.Nx = (data.xmax-data.xmin) / data.dx;
 data.x = (data.xmin:data.dx:data.xmax-data.dx)';
 % 外势
-data.Potential = @(x) 10*x.^2/2;
+data.Potential = @(x) x.^2/2;
 data.V = data.Potential(data.x);
 
 % ============================================================

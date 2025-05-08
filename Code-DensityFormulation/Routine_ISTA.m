@@ -21,6 +21,7 @@ tol = 1e-12;
 Xc = X;
 k = 1;
 err_l2 = 1;
+max_iter = 1e3;
 %===================================================
 while(k==1 || err_l2 > tol)
     L = L0;
@@ -29,7 +30,7 @@ while(k==1 || err_l2 > tol)
     grad_f = GradObj_Func(Xc, data);
     X_prox = pL_Func(Xc, L, data);
     % 使用back-tracking寻找L
-    while(Obj_Func(X_prox, data) >  QL_Func(X_prox, Xc, L, @Obj_Func, @GradObj_Func, data))  
+    while(Obj_Func(X_prox, data) >  QL_Func(X_prox, Xc, L, data))  
         L = eta * L;
         X_prox = pL_Func(Xc, L, data);
     end
@@ -37,10 +38,15 @@ while(k==1 || err_l2 > tol)
     Xo = Xc;
     Xc = X_prox; 
     k = k + 1;
-    % 误差计算    
-    err_l2 = norm((Xo - Xc).^2 * sqrt(data.dx), 2);
-    % 图像
-    % plot(data.x, Xc); hold on
-    % disp(['err = ', num2str(err_l2)]);
+    if k > max_iter
+        break;
+    end
+    % L2-误差计算    
+    err_l2 = sqrt(data.dx * sum((Xc - Xo).^2));
+    disp(['ISTA:' ,num2str(err_l2)]);
+
+    %% 测试能量下降速度
+    % E(k) = Obj_Func(Xc, data);
+    % plot(E(2:end)); title('Energy vs Iteration');
 end
 % hold off

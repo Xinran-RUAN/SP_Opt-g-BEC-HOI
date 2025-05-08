@@ -9,12 +9,12 @@ function [y_out] = myPosConProj(x_in,mass_in,domain_in,myeps)
 if nargin==1
     mass_in     = 1;
     domain_in   = 1; 
-    myeps       = 1e-10;
+    myeps       = 1e-14;
 elseif nargin==2
     domain_in   = 1; 
-    myeps       = 1e-10;
+    myeps       = 1e-14;
 elseif nargin==3
-    myeps       = 1e-10;
+    myeps       = 1e-14;
 end
 
 NofDof = length(x_in);

@@ -13,9 +13,10 @@ while err > tol
     % Xn = myPosConProj(Xn, mass, domain_size, 1e-12); % 投影至可行集： mass = dx * sum(x), dx = domain_size / Nx
     %% FISTA
     % Xn = myFISTA(Xo, data);
-    Xn = Routine_ISTA(Xo, data);
+    Xn = Routine_FISTA(Xo, data);
     %%
-    err = max(abs(Xn - Xo));
+    % err = max(abs(Xn - Xo));
+    err = sqrt(data.dx * sum((Xn - Xo).^2));
     disp(err);
 end
 
