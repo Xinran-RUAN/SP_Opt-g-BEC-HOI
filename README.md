@@ -150,10 +150,10 @@ To summarize
 
 | Energy | Gradient | Matlab Code |
 | ------- | ------- | ---------  |
-|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{\rho_j+\varepsilon}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ | `Drho = fourier_diff(rho, Lambda);` <br> `Grho = Drho ./ (rho + vep);` <br> `DtGrho = fourier_diff_T(Grho, Lambda);` <br> `dE_kin = h * (DtGrho / 4 - Grho.^2 / 8);` |
+|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{\rho_j+\varepsilon}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ | `Drho = fourier_diff(rho, Lambda);` \langle br\rangle  `Grho = Drho ./ (rho + vep);` \langle br\rangle  `DtGrho = fourier_diff_T(Grho, Lambda);` \langle br\rangle  `dE_kin = h * (DtGrho / 4 - Grho.^2 / 8);` |
 |$h\sum_{j=0}^{N-1} V_j\rho_j$ | $hV$ | `dE_pot = h * V;`|
 |$h\sum_{j=0}^{N-1} \frac{\beta}{2}\rho_j^2$ | $h\beta \rho$ | `dE_beta = h * beta * rho` |
-|$h\sum_{j=0}^{N-1} \frac{\delta}{2} (D\rho)_j^2$ | $h\delta D^T D\rho$ | `Drho = fourier_diff(rho, Lambda);` <br> `DtDrho = fourier_diff_T(Drho, Lambda);` <br> `dE_delta = h * delta * DtDrho;` |
+|$h\sum_{j=0}^{N-1} \frac{\delta}{2} (D\rho)_j^2$ | $h\delta D^T D\rho$ | `Drho = fourier_diff(rho, Lambda);` \langle br\rangle  `DtDrho = fourier_diff_T(Drho, Lambda);` \langle br\rangle  `dE_delta = h * delta * DtDrho;` |
 
 **Proposition**: $\nabla E(\rho)$ is Lipschitz continuous in $\rho$, i.e. 
 $$
@@ -176,7 +176,7 @@ Key functions used in the algorithm:
 
 *  $Q_L(x, y)$: Quadratic approximation of $f(x)$ defined as (linear approximation with quadratic penalty)
 $$
-	Q_L(x, y) := f(y) + <x - y, \nabla f(y)> + \frac{L}{2}\|x-y\|^2.
+	Q_L(x, y) := f(y) + \langle x - y, \nabla f(y)\rangle  + \frac{L}{2}\|x-y\|^2.
 $$
 
 *  $p_L(y)$: Unique minimizer of $Q_L(x,y)$ in the feasible set $S_N^+(1)$, where $S_N^+(1) = S_N^+ \cap \{X\in\mathbb{R}^N \, | \,  h \sum_{i=1}^N X(i)= 1\}$. 
@@ -194,7 +194,7 @@ Here $L$ can be taken as $L(f)$, a Lipschitz constant of $\nabla f$.
 
 **Algorithm 1.2**: ISTA with backtracking
 $$
-	L_0 > 0, \, \eta > 1
+	L_0 \rangle  0, \, \eta \rangle  1
 $$
 Step k: 
 Find smallest $i_k$ such that with $\overline{L} = \eta^{i_k} L_{k-1}$, 
@@ -221,7 +221,7 @@ $$
 
 **Algorithm 2.2**: FISTA with backtracking
 $$
-	L_0 > 0, \, \eta > 1, \, y_1 = x_0, \, t_1 = 1
+	L_0 \rangle  0, \, \eta \rangle  1, \, y_1 = x_0, \, t_1 = 1
 $$
 Step k: 
 Find smallest $i_k$ such that with $\overline{L} = \eta^{i_k} L_{k-1}$, 
@@ -238,67 +238,24 @@ $$
 $$
 
 ### Convergence analysis
+#### Preparation
 **Proposition 1**:If $f$ is convex and $\|\nabla f(x) - \nabla f(y) \| \le L_0 \|x - y\|$, then 
 $$
 \begin{aligned}
-	& f(x) \ge f(y) + <x - y, \nabla f(y)> \\
-	& f(x) \le f(y) + <x - y, \nabla f(y)> + \frac{L_0}{2}\|x-y\|^2 = Q(x, y).
+	& f(x) \ge f(y) + \langle x - y, \nabla f(y)\rangle  \\
+	& f(x) \le f(y) + \langle x - y, \nabla f(y)\rangle  + \frac{L_0}{2}\|x-y\|^2 = Q(x, y).
 \end{aligned}
 $$
 **Proof**: We only show the second inequality here.
 $$
 \begin{aligned}
-	f(x) - f(y) - <x - y, \nabla f(y)> &= \int_0^1 <\nabla f(y+t(x-y)) - \nabla f(y), x-y> dt \\
+	f(x) - f(y) - \langle x - y, \nabla f(y)\rangle  &= \int_0^1 \langle \nabla f(y+t(x-y)) - \nabla f(y), x-y\rangle  dt \\
 	& \le L_0 \int_0^1 t \|x-y\|^2 dt \\
 	& = \frac{L_0}{2} \|x-y\|^2.
 \end{aligned}
 $$
 
-**Proposition 2**: For any $x \in \mathbb{R}^N,y \in S_N^+(1)$, if 
-$$
-	f(p_L(y)) \le Q(p_L(y), y) = f(y) + <p_L(y) - y, \nabla f(y)> + \frac{L}{2}\|p_L(y)-y\|^2,
-$$
-then 
-$$
-	F(x) - F(p_L(y)) \ge \frac{L}{2} \|p_L(y)-y\|^2 + L<y-x, p_L(y)-y>, 
-$$
-where $F(x) := f(x) + \mathbb{I}_{S_N^+(1)}(x)$.
-**Proof**: If $x\notin S_N^+(1)$, then $F(x)=+\infty$ and the inequality is trivial. 
-If $x\in S_N^+(1)$, then
-$$
-\begin{aligned}
-	F(x) - F(p_L(y)) & = f(x) - f(p_L(y)) \\
-	& \ge f(x) - f(y) - <p_L(y) - y, \nabla f(y)> - \frac{L}{2}\|p_L(y)-y\|^2 \\
-	& \ge <x - p_L(y), \nabla f(y)> - \frac{L}{2}\|p_L(y)-y\|^2 .
-\end{aligned}
-$$
-
-If $y - \frac{1}{L} \nabla f(y) \in S_N^+(1)$, then 
-$$
-	p_L(y) = y - \frac{1}{L} \nabla f(y)
-$$
-and therefore
-$$
-	\nabla f(y) = L(y - p_L(y)).
-$$
-By substitution, we get
-$$
-\begin{aligned}
-	f(x) - f(p_L(y)) &\ge L<x - p_L(y), y - p_L(y)> - \frac{L}{2}\|p_L(y)-y\|^2 \\
-	& = \frac{L}{2} \|p_L(y)-y\|^2 + L<y-x, p_L(y)-y>.
-\end{aligned}
-$$
-
-If $y - \frac{1}{L} \nabla f(y) \notin S_N^+(1)$, by definition of $p_L(y)$, we have 
-$$
-	\left\|x -\left( y - \frac{1}{L}\nabla f(y)\right)\right\| \ge  \left\|p_L(y) -\left( y - \frac{1}{L}\nabla f(y)\right)\right\|,
-$$
-which implies 
-$$
-	<x-p_L(y), \nabla f(y)> \, \ge \frac{L}{2}\|p_L(y)-y\|^2 - \frac{L}{2}\|x-y\|^2 
-$$
-_**Fails!**_
-
+The following proposition is important to prove convergence. A proof of the proposition will depend on the following lemma.
 **Lemma**: If $x^*$ is a local minimizer of $f(x)$ in $\Omega$, then we must have
 $$
 	-\nabla f \in N_\Omega(x^*),
@@ -310,29 +267,122 @@ $$
 Here $T_\Omega(x)$ is the tangent cone, the set of all tangents at $x$. We say $d$ is a tangent at $x$ if there exist $\{z_k\}\to x$ and $\{t_k\}\to0$ such that 
 $\lim_{k\to\infty} \frac{z_k-x}{t_k} = d$. 
 
-With the above lemma, noticing the definition of $p_L(y)$, we must have 
+**Proposition 2**: For any $x \in \mathbb{R}^N,y \in S_N^+(1)$, if 
 $$
-	p_L(y) - \left(y-\frac{1}{L} \nabla f(y)\right) \in N_\Omega(p_L(y)).
+	f(p_L(y)) \le Q(p_L(y), y) = f(y) + \langle p_L(y) - y, \nabla f(y)\rangle  + \frac{L}{2}\|p_L(y)-y\|^2,
 $$
-Here $\Omega = S_N^+(1)$ is the feasible set. Define 
+then 
+$$
+	F(x) - F(p_L(y)) \ge \frac{L}{2} \|p_L(y)-y\|^2 + L\langle y-x, p_L(y)-y\rangle , 
+$$
+where $F(x) := f(x) + \mathbb{I}_{S_N^+(1)}(x)$.
+**Proof**: If $x\notin S_N^+(1)$, then $F(x)=+\infty$ and the inequality is trivial. 
+If $x\in S_N^+(1)$, noticing the definition of $p_L(y)$, we must have via the lemma that
+$$
+	p_L(y) - \left(y-\frac{1}{L} \nabla f(y)\right) \in N_{S_N^+(1)}(p_L(y)).
+$$
+Define 
 $$
 	\gamma = -\nabla f(y) + L(y - p_L(y)),
 $$
 then 
 $$
-	<\gamma, w> \le 0, \, \forall w\in T_\Omega(p_L(y)).
+	\langle \gamma, w\rangle  \le 0, \, \forall w\in T_{S_N^+(1)}(p_L(y)).
 $$
-It is easy to check that for all $x\in\Omega$, $x-p_L(y) \in T_\Omega(p_L(y))$, which implies 
+It is easy to check that for all $x\in S_N^+(1)$, $x-p_L(y) \in T_{S_N^+(1)}(p_L(y))$, which implies 
 $$
-	<x-p_L(y), \gamma> \le 0.
+	\langle x-p_L(y), \gamma\rangle  \le 0.
 $$
 Then 
 $$
 \begin{aligned}
-	f(x) - f(p_L(y)) \ge f(x) - f(p_L(y)) + <x-p_L(y), \gamma> \\
+	f(x) - f(p_L(y)) & \ge f(x) - Q(p_L(y),y) \\ 
+	& = f(x) - f(y) - \langle p_L(y) - y, \nabla f(y)\rangle  - \frac{L}{2}\|p_L(y)-y\|^2 \\
+	& \ge \langle x - p_L(y), \nabla f(y)\rangle  - \frac{L}{2}\|p_L(y)-y\|^2 \text{ (by convexity of } f) \\ 
+	&\ge \langle x - p_L(y), \nabla f(y)\rangle  - \frac{L}{2}\|p_L(y)-y\|^2 + \langle x-p_L(y), \gamma\rangle  \\
+	& = \langle x - p_L(y), \nabla f(y) + \gamma\rangle  - \frac{L}{2}\|p_L(y)-y\|^2  \\
+	& = L\langle x - p_L(y), y - p_L(y)\rangle  - \frac{L}{2}\|p_L(y)-y\|^2 \\
+	& = L\langle x - y, y - p_L(y)\rangle  + \frac{L}{2}\|p_L(y)-y\|^2 \\
+	& = L\langle y - x, p_L(y) - y\rangle  + \frac{L}{2}\|p_L(y)-y\|^2
 \end{aligned}
 $$
 
+**Remark**: If $y - \frac{1}{L} \nabla f(y) \in S_N^+(1)$, a simpler proof goes as follows, noticing that  
+$$
+	p_L(y) = y - \frac{1}{L} \nabla f(y)
+$$
+and therefore
+$$
+	\nabla f(y) = L(y - p_L(y)).
+$$
+By substitution, we get
+$$
+\begin{aligned}
+	f(x) - f(p_L(y)) &\ge L\langle x - p_L(y), y - p_L(y)\rangle- \frac{L}{2}\|p_L(y)-y\|^2 \\
+	& = \frac{L}{2} \|p_L(y)-y\|^2 + L\langle y-x, p_L(y)-y\rangle.
+\end{aligned}
+$$
+
+However, it is difficult to prove $y - \frac{1}{L} \nabla f(y) \in S_N^+(1)$ directly. Here is a try. By definition of $p_L(y)$, we have 
+$$
+	\left\|x -\left( y - \frac{1}{L}\nabla f(y)\right)\right\| \ge  \left\|p_L(y) -\left( y - \frac{1}{L}\nabla f(y)\right)\right\|,
+$$
+which implies 
+$$
+	\langle x-p_L(y), \nabla f(y) \rangle \, \ge \frac{L}{2}\|p_L(y)-y\|^2 - \frac{L}{2}\|x-y\|^2 
+$$
+**But the arugument will stop here!**
+
+#### Convergence of ISTA 
+Now we are ready to prove the convergence of ISTA using the following lemma.
+**Lemma**(余弦定理): $\|b-a\|^2 + 2 \langle b-a, a-c \rangle = \|b-c\|^2 - \| a - c \|^2$. 
+
+Suppose $\{ X_k \}$ is the sequence produced by ISTA and $X^*$ is the exact minimizer of $E(\cdot)$. 
+
+By choosing $x = X^*$ and $y=X_k$, we have $X_{k+1} = p_L(X_k)$ and 
+$$
+\begin{aligned}
+	\frac{2}{L}E(X^*) - \frac{2}{L} E(X_{k+1})& \ge 2\langle X_k - X^*, X_{k+1} - X_k \rangle + \|X_{k+1} - X_k \|^2 \\
+	& = \|X_{k+1} - X^* \|^2 - \|X_{k} - X^* \|^2.
+\end{aligned}
+$$
+Summing over $k = 0, 1, \cdots, n-1$, we get
+$$
+\begin{aligned}
+	\frac{2}{L}\left(n E(X^*) - \sum_{k=0}^{n-1} E(X_{k+1})\right)& \ge  \|X_{n} - X^* \|^2 - \|X_{0} - X^* \|^2.
+\end{aligned}
+$$
+
+By choosing $x=y=X_k$, we have $p_L(y) = X_{k+1}$ and
+$$
+\begin{aligned}
+	\frac{2}{L}E(X_k) - \frac{2}{L} E(X_{k+1})& \ge 2\langle X_k - X_k, X_{k+1} - X_k \rangle + \|X_{k+1} - X_k \|^2 \\
+	& = \|X_{k+1} - X_k \|^2.
+\end{aligned}
+$$
+Multiplying both sides by $k$ and summing over $k=0,1,\cdots, n-1$, we have 
+$$
+\begin{aligned}
+	\frac{2}{L} \sum_{k=0}^{n-1}\left( k E(X_k) - k E(X_{k+1}) \right) & \ge \sum_{k=0}^{n-1} k\|X_{k+1} - X_k \|^2.
+\end{aligned}
+$$
+Noticing that $k E(X_k) - k E(X_{k+1}) = k E(X_k) - (k+1) E(X_{k+1}) + E(X_{k+1})$, we have 
+$$
+\begin{aligned}
+	\frac{2}{L} \left(\sum_{k=0}^{n-1} E(X_{k+1})  - n E(X_n) \right) & \ge \sum_{k=0}^{n-1} k\|X_{k+1} - X_k \|^2.
+\end{aligned}
+$$
+Combining the two results, we have 
+$$
+\begin{aligned}
+	\frac{2n}{L}\left( E(X^*)  -  E(X_n) \right) & \ge \|X_{n} - X^* \|^2 - \|X_{0} - X^* \|^2 + \sum_{k=0}^{n-1} k\|X_{k+1} - X_k \|^2 \\
+	& \ge  - \|X_{0} - X^* \|^2,
+\end{aligned}
+$$
+which immediately implies the linear convergence
+$$
+	E(X_n) - E(X^*) \le \frac{L}{2}\frac{\|X_{0} - X^* \|^2}{n}.
+$$
 
 ## Numerical Test
 $V(x)=\frac{x^2}{2}$, $\beta = 10$, $\delta = 10$, $h_0=1/2$
