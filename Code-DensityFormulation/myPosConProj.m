@@ -39,7 +39,7 @@ for it = 1 : 50
     Newton_Residual = mass_in - C_mat(:,project_pos_vec) * f_plus_cTlambda(project_pos_vec);
     Newton_Residual_norm = norm(Newton_Residual);
 
-    disp([num2str(it-1),' Newton iteration, residual = ',num2str(Newton_Residual_norm)]);
+    % disp([num2str(it-1),' Newton iteration, residual = ',num2str(Newton_Residual_norm)]);
     if Newton_Residual_norm<myeps
         break;
     end

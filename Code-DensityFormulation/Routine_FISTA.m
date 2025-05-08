@@ -45,5 +45,4 @@ while(k==1 || err_l2 > tol)
     k = k + 1;
     % 误差计算
     err_l2 = norm((Xo - Xc).^2 * sqrt(data.dx), 2);
-    disp(err_l2);
 end

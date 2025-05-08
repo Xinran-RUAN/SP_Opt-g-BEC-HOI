@@ -109,7 +109,7 @@ where $D = \mathcal{R}(\frac{1}{N} F \Lambda\overline{F}), D^T = \mathcal{R}(\fr
 ```Matlab
 function [drho] = fourier_diff(rho, Lambda)
     Frho = fft(rho);
-    Fdrho = Lambda * Frho;
+    Fdrho = Lambda .* Frho;
     drho = real(ifft(Fdrho));
 end
 ```
@@ -117,7 +117,7 @@ end
 ```Matlab
 function [drho_T] = fourier_diff_T(rho, Lambda)
     iFrho = ifft(rho);
-    iFdrho = Lambda * iFrho;
+    iFdrho = Lambda .* iFrho;
     drho_T = real(fft(iFdrho));
 end
 ```
@@ -171,6 +171,17 @@ $$
 $$
 where $\|D\|_\infty = max_j \sum_{k=1}^N |D_{jk}|$.
 
-### Future work
+## ISTA/FISTA
+**Algorithm 1**: ISTA with constant stepsize
+$$
+	X_k = p_L(X_{k-1})
+$$
+where 
+$$
+	p_L(y) = argmin_{x\in S_N^+(1)} \left\| x - \left(y-\frac{1}{L}\nabla f(y)\right) \right\|
+$$
+with $S_N^+(1) = S_N^+ \cap \{X\in\mathbb{R}^N \, | \,  h \sum_{i=1}^N X(i)= 1\}$.
+
+## Future work
 
 1. Bad behavior for small $\varepsilon$: new regularization / JKO (possible? uniformly effective)

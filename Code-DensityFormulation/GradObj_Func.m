@@ -1,32 +1,32 @@
-function[G] = GradObj_Func(X, data)
-X = real(X); % check!
+% X is real-valued
+function[dE] = GradObj_Func(X, data)
 beta = data.beta;
 delta = data.delta;
 vep =data.vep;
 h = data.dx;
 Lx = data.xmax - data.xmin;
 N = data.Nx;
-mu = 2 * pi / Lx * (-N/2:N/2-1)';
-Dx = D_x(X, mu);
-cDx = conjD_x(X, mu);
+V = data.V;
+
+%% get diff_X = DX 
+Lambda = 2 * pi * 1i / Lx * [0:(N/2-1), (-N/2:-1)];
+Lambda = reshape(Lambda, size(X)); % Lambda与X形状保持一致
+D_X = fourier_diff(X, Lambda);
+
 %% kinetic energy
-G_kin = h * (tranD_x(cDx./(X+vep), mu) + conjtranD_x(Dx./(X+vep), mu) - abs(Dx).^2./(X+vep).^2);
+G_X = D_X ./ (X + vep);
+Dt_G_X = fourier_diff_T(G_X, Lambda);
+dE_kin = h * (Dt_G_X / 4 - G_X.^2 / 8);
 
 %% potential energy
-V = data.V;
-G_pot = h * V .* X ./ sqrt(X.^2 + vep.^2);
+dE_pot = h * V .* X ./ sqrt(X.^2 + vep.^2);
 
 %% beta - interaction
-G_beta = h * beta * X;
+dE_beta = h * beta * X;
 
 %% delta - interaction
-G_delta = 0.5 * delta * h * (tranD_x(cDx, mu) + conjtranD_x(Dx, mu));
+Dt_D_X = fourier_diff_T(D_X, Lambda);
+dE_delta = h * delta * Dt_D_X;
 
-
-% figure
-% plot(G_kin, 'b'); hold on;
-% plot(G_pot, 'r'); hold on;
-% plot(G_beta, 'k'); hold on;
-% plot(G_delta, 'g'); hold off;
 %%
-G = G_kin + G_pot + G_beta + G_delta;
+dE = dE_kin + dE_pot + dE_beta + dE_delta;

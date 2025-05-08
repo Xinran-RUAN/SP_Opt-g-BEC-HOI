@@ -12,9 +12,11 @@ while err > tol
     % Xn = Gradient_Decsent(Xo, data);  % 梯度下降
     % Xn = myPosConProj(Xn, mass, domain_size, 1e-12); % 投影至可行集： mass = dx * sum(x), dx = domain_size / Nx
     %% FISTA
-    Xn = myFISTA(Xo, data);
+    % Xn = myFISTA(Xo, data);
+    Xn = Routine_ISTA(Xo, data);
     %%
     err = max(abs(Xn - Xo));
+    disp(err);
 end
 
 % Print Energy and Chemical Potential

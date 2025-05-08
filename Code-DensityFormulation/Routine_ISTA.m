@@ -27,11 +27,11 @@ while(k==1 || err_l2 > tol)
     %===================================================
     % 计算 Xn = p_L(Xc)
     grad_f = GradObj_Func(Xc, data);
-    X_prox = pL_Func(Xc - (grad_f) / L, data);
+    X_prox = pL_Func(Xc, L, data);
     % 使用back-tracking寻找L
-    while(Obj_Func(X_prox, data) > QL_Approx(X_prox, Xc, L, data))  
+    while(Obj_Func(X_prox, data) >  QL_Func(X_prox, Xc, L, @Obj_Func, @GradObj_Func, data))  
         L = eta * L;
-        X_prox = pL_Func(Xc - (grad_f) / L, data);
+        X_prox = pL_Func(Xc, L, data);
     end
     % 更新
     Xo = Xc;
@@ -40,5 +40,7 @@ while(k==1 || err_l2 > tol)
     % 误差计算    
     err_l2 = norm((Xo - Xc).^2 * sqrt(data.dx), 2);
     % 图像
-    Plot_X;
+    % plot(data.x, Xc); hold on
+    % disp(['err = ', num2str(err_l2)]);
 end
+% hold off
