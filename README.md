@@ -194,7 +194,7 @@ Here $L$ can be taken as $L(f)$, a Lipschitz constant of $\nabla f$.
 
 **Algorithm 1.2**: ISTA with backtracking
 $$
-	L_0 \rangle  0, \, \eta \rangle  1
+	L_0 > 0, \, \eta > 1
 $$
 Step k: 
 Find smallest $i_k$ such that with $\overline{L} = \eta^{i_k} L_{k-1}$, 
@@ -221,7 +221,7 @@ $$
 
 **Algorithm 2.2**: FISTA with backtracking
 $$
-	L_0 \rangle  0, \, \eta \rangle  1, \, y_1 = x_0, \, t_1 = 1
+	L_0 > 0, \, \eta > 1, \, y_1 = x_0, \, t_1 = 1
 $$
 Step k: 
 Find smallest $i_k$ such that with $\overline{L} = \eta^{i_k} L_{k-1}$, 
