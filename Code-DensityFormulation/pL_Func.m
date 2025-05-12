@@ -3,4 +3,5 @@ mass = 1;
 domain_size = data.xmax - data.xmin;
 G = GradObj_Func(X, data);
 Xt = X - G / L;
-pL_X = myPosConProj(Xt, mass, domain_size, 1e-12);
+% pL_X = myPosConProj(Xt, mass, domain_size, 1e-14);
+pL_X = Simplex_Proj(Xt, mass / data.dx);

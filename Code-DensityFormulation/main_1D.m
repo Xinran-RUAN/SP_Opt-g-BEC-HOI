@@ -13,7 +13,7 @@ data.delta = 1e1;
 data.vep = 1e-3; 
 % 计算区域
 Lx = 16;
-data.dx = 10^(-3);
+data.dx = 1/2^8;
 data.xmax = Lx;
 data.xmin = -Lx;
 data.Nx = (data.xmax-data.xmin) / data.dx;

@@ -399,6 +399,15 @@ We take the solution with $h=10^{-3}$ as the exact solution.
 | $Abs(E(\rho)-E(\rho_{ex}))$ | 6.67E-5 | 1.08E-7 | 1.34E-8 | 2.06E-9 |
 | L2-norm | 3.87E-3 | 1.02E-3 | 2.52E-4 | 5.91E-5 |
 
+
+Here we change the projection to be the simplex method.
+
+|   | $h=h_0$ |$h = h_0/2$|$h=h_0/4$|$h=h_0/8$| $h = h_0/2^7$|
+|-------|-------|-------|-------|-------|-------|
+| $\varepsilon = 10^{-3}$ | 2.204129497461702 | 2.204062679240169 | 2.204062800910644 | 2.204062789539392 |  2.204062785844281 |
+| Difference | 6.67E-5 | 
+
+
 ## Future work
 
 1. Bad behavior for small $\varepsilon$: new regularization / JKO (possible? uniformly effective)
