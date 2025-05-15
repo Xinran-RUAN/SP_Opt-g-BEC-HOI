@@ -408,6 +408,18 @@ Here we change the projection to be the simplex method.
 | Difference | 6.67E-5 | 
 
 
+## Logs
+#### 2025/05/12 
+Lin Bo: If we change the choice of the numbers, we might get the convergence of $\rho$, not just $E$.
+
+Lin Bo: The $O(1/k^2)$ convergence is called first-order convergence.
+
+Numerical tests indicate that the direct projection has essentially the same effect as the method proposed by B. Lin.
+
+#### 2025/05/15 
+We can't get the spectral accuracy. A test via "plot\_spectral\_decay.m" shows that rho is not smooth enough. 
+![decay](./images/spectral_coeff_decay.png)
+
 ## Future work
 
 1. Bad behavior for small $\varepsilon$: new regularization / JKO (possible? uniformly effective)
