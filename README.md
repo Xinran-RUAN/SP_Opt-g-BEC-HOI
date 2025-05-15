@@ -422,7 +422,7 @@ We can't get the spectral accuracy. A test via "plot\_spectral\_decay.m" shows t
 
 | Energy | Gradient | Matlab Code |
 | ------- | ------- | ---------  |
-|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{8\sqrt{\rho_j^2+\varepsilon^2}}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ | `Drho = fourier_diff(rho, Lambda);` \langle br\rangle  `Grho = Drho ./ (rho + vep);` \langle br\rangle  `DtGrho = fourier_diff_T(Grho, Lambda);` \langle br\rangle  `dE_kin = h * (DtGrho / 4 - Grho.^2 / 8);` |
+|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{8\sqrt{\rho_j^2+\varepsilon^2}}$| $h \left[ D^T\frac{D\rho}{4\sqrt{\rho_j^2+\varepsilon^2}} - \frac{(D\rho)^2}{8(\rho^2+\varepsilon^2)} .* \frac{\rho}{\sqrt{\rho^2+\varepsilon^2}}\right]$ | `Drho = fourier_diff(rho, Lambda);`  `Grho = Drho ./ sqrt(rho.^2 + vep^2);` `DtGrho = fourier_diff_T(Grho, Lambda);` `dE_kin = h * (DtGrho / 4 - Grho.^2 .* rho ./ sqrt(rho.^2 + vep^2) / 8);` |
 
 ## Future work
 
