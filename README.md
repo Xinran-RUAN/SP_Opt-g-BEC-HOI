@@ -150,7 +150,7 @@ To summarize
 
 | Energy | Gradient | Matlab Code |
 | ------- | ------- | ---------  |
-|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{\rho_j+\varepsilon}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ | `Drho = fourier_diff(rho, Lambda);` \langle br\rangle  `Grho = Drho ./ (rho + vep);` \langle br\rangle  `DtGrho = fourier_diff_T(Grho, Lambda);` \langle br\rangle  `dE_kin = h * (DtGrho / 4 - Grho.^2 / 8);` |
+|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{8(\rho_j+\varepsilon)}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ | `Drho = fourier_diff(rho, Lambda);` \langle br\rangle  `Grho = Drho ./ (rho + vep);` \langle br\rangle  `DtGrho = fourier_diff_T(Grho, Lambda);` \langle br\rangle  `dE_kin = h * (DtGrho / 4 - Grho.^2 / 8);` |
 |$h\sum_{j=0}^{N-1} V_j\rho_j$ | $hV$ | `dE_pot = h * V;`|
 |$h\sum_{j=0}^{N-1} \frac{\beta}{2}\rho_j^2$ | $h\beta \rho$ | `dE_beta = h * beta * rho` |
 |$h\sum_{j=0}^{N-1} \frac{\delta}{2} (D\rho)_j^2$ | $h\delta D^T D\rho$ | `Drho = fourier_diff(rho, Lambda);` \langle br\rangle  `DtDrho = fourier_diff_T(Drho, Lambda);` \langle br\rangle  `dE_delta = h * delta * DtDrho;` |
@@ -419,6 +419,10 @@ Numerical tests indicate that the direct projection has essentially the same eff
 #### 2025/05/15 
 We can't get the spectral accuracy. A test via "plot\_spectral\_decay.m" shows that rho is not smooth enough. 
 ![decay](./images/spectral_coeff_decay.png)
+
+| Energy | Gradient | Matlab Code |
+| ------- | ------- | ---------  |
+|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{8\sqrt{\rho_j^2+\varepsilon^2}}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ | `Drho = fourier_diff(rho, Lambda);` \langle br\rangle  `Grho = Drho ./ (rho + vep);` \langle br\rangle  `DtGrho = fourier_diff_T(Grho, Lambda);` \langle br\rangle  `dE_kin = h * (DtGrho / 4 - Grho.^2 / 8);` |
 
 ## Future work
 
