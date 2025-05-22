@@ -13,7 +13,8 @@ Lambda = reshape(Lambda, size(X)); % Lambda与X形状保持一致
 D_X = fourier_diff(X, Lambda);
 
 %% kinetic energy
-E_kin = h / 8 * sum(abs(D_X).^2 ./ (X + vep)); 
+% E_kin = h / 8 * sum(abs(D_X).^2 ./ (X + vep)); 
+E_kin = h / 8 * sum(abs(D_X).^2 ./ sqrt(X.^2 + vep^2)); 
 
 %% potential energy
 V = data.V;

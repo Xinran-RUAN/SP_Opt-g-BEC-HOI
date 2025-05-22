@@ -21,4 +21,4 @@ while err > tol
 end
 
 % Print Energy and Chemical Potential
-[E, ~] = myDiscreteEnergy(Xn, data);
+E = Obj_Func(Xn, data);

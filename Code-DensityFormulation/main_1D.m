@@ -36,8 +36,23 @@ toc;    % 计时结束
 % ============================================================
 % 画图
 plot(data.x,Rho)
+
+%% save data
+folderPath = './Data';  % 可以是绝对路径或相对路径
+
+if ~exist(folderPath, 'dir')
+    mkdir(folderPath);
+end
+
+cd(folderPath);
+
+% filename = strcat('MGPE-FP1d-Bet-',int2str(data.beta),...
+%     '-Del-',int2str(data.delta),...
+%     '-Vep-',num2str(data.vep),...
+%     '-dx-',num2str(data.dx),'.mat');
 filename = strcat('MGPE-FP1d-Bet-',int2str(data.beta),...
     '-Del-',int2str(data.delta),...
     '-Vep-',num2str(data.vep),...
-    '-dx-',num2str(data.dx),'.mat');
+    '-dx-',num2str(data.dx),'_reg1.mat'); % a new regularization of the kinetic part
 save(filename)
+cd ..

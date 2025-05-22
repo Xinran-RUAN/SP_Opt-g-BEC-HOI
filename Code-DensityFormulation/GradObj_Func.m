@@ -14,9 +14,13 @@ Lambda = reshape(Lambda, size(X)); % Lambda与X形状保持一致
 D_X = fourier_diff(X, Lambda);
 
 %% kinetic energy
-G_X = D_X ./ (X + vep);
+% G_X = D_X ./ (X + vep);
+% Dt_G_X = fourier_diff_T(G_X, Lambda);
+% dE_kin = h * (Dt_G_X / 4 - G_X.^2 / 8);
+
+G_X = D_X ./ sqrt(X.^2 + vep^2);
 Dt_G_X = fourier_diff_T(G_X, Lambda);
-dE_kin = h * (Dt_G_X / 4 - G_X.^2 / 8);
+dE_kin = h * (Dt_G_X / 4 - G_X.^2 .* X ./ sqrt(X.^2 + vep^2) / 8);
 
 %% potential energy
 dE_pot = h * V .* X ./ sqrt(X.^2 + vep.^2);
