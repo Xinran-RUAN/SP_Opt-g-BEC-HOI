@@ -5,12 +5,9 @@ delta = data.delta;
 vep =data.vep;
 h = data.dx;
 Lx = data.xmax - data.xmin;
-N = data.Nx;
 
 %% get diff_X = DX 
-Lambda = 2 * pi * 1i / Lx * [0:(N/2-1), (-N/2:-1)];
-Lambda = reshape(Lambda, size(X)); % Lambda与X形状保持一致
-D_X = fourier_diff(X, Lambda);
+D_X = fourier_diff(X, Lx);
 
 %% kinetic energy
 % % =================================================
@@ -37,7 +34,7 @@ E_delta = 0.5 * delta * h * sum(abs(D_X).^2);
 
 %% 高阶项 - 抑制高频部分
 alpha = 1e-8;
-Laplacian_X = fourier_diff_T(fourier_diff(X, Lambda), Lambda);
+Laplacian_X = fourier_diff_T(fourier_diff(X, Lx), Lx);
 E_high = alpha * h * sum(Laplacian_X.^2);
 
 %%

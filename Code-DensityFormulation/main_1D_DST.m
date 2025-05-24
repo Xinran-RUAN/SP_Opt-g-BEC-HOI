@@ -16,8 +16,8 @@ Lx = 32;
 data.dx = 1/2^1;
 data.xmax = Lx;
 data.xmin = -Lx;
-data.Nx = (data.xmax-data.xmin) / data.dx;
-data.x = (data.xmin:data.dx:data.xmax-data.dx)';
+data.Nx = (data.xmax-data.xmin) / data.dx - 2;
+data.x = (data.xmin+data.dx:data.dx:data.xmax-data.dx)';
 % 外势
 data.Potential = @(x) x.^2/2;
 data.V = data.Potential(data.x);
