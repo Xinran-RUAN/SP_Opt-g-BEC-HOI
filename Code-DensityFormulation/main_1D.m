@@ -12,8 +12,8 @@ data.beta = 1e1;
 data.delta = 1e1;
 data.vep = 1e-3; 
 % 计算区域
-Lx = 16;
-data.dx = 1/2^8;
+Lx = 32;
+data.dx = 1/2^5;
 data.xmax = Lx;
 data.xmin = -Lx;
 data.Nx = (data.xmax-data.xmin) / data.dx;
@@ -53,6 +53,6 @@ cd(folderPath);
 filename = strcat('MGPE-FP1d-Bet-',int2str(data.beta),...
     '-Del-',int2str(data.delta),...
     '-Vep-',num2str(data.vep),...
-    '-dx-',num2str(data.dx),'_reg1.mat'); % a new regularization of the kinetic part
+    '-dx-',num2str(data.dx),'_reg1_FISTA_CD_highE.mat'); % a new regularization of the kinetic part
 save(filename)
 cd ..

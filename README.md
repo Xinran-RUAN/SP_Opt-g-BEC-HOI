@@ -150,10 +150,10 @@ To summarize
 
 | Energy | Gradient | Matlab Code |
 | ------- | ------- | ---------  |
-|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{8(\rho_j+\varepsilon)}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ | `Drho = fourier_diff(rho, Lambda);` \langle br\rangle  `Grho = Drho ./ (rho + vep);` \langle br\rangle  `DtGrho = fourier_diff_T(Grho, Lambda);` \langle br\rangle  `dE_kin = h * (DtGrho / 4 - Grho.^2 / 8);` |
+|$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{8(\rho_j+\varepsilon)}$| $h \left[ D^T\frac{D\rho}{4(\rho+\varepsilon)} - \frac{(D\rho)^2}{8(\rho+\varepsilon)^2}\right]$ | `Drho = fourier_diff(rho, Lambda);`  `Grho = Drho ./ (rho + vep);`  `DtGrho = fourier_diff_T(Grho, Lambda);`    `dE_kin = h * (DtGrho / 4 - Grho.^2 / 8);` |
 |$h\sum_{j=0}^{N-1} V_j\rho_j$ | $hV$ | `dE_pot = h * V;`|
 |$h\sum_{j=0}^{N-1} \frac{\beta}{2}\rho_j^2$ | $h\beta \rho$ | `dE_beta = h * beta * rho` |
-|$h\sum_{j=0}^{N-1} \frac{\delta}{2} (D\rho)_j^2$ | $h\delta D^T D\rho$ | `Drho = fourier_diff(rho, Lambda);` \langle br\rangle  `DtDrho = fourier_diff_T(Drho, Lambda);` \langle br\rangle  `dE_delta = h * delta * DtDrho;` |
+|$h\sum_{j=0}^{N-1} \frac{\delta}{2} (D\rho)_j^2$ | $h\delta D^T D\rho$ | `Drho = fourier_diff(rho, Lambda);`    `DtDrho = fourier_diff_T(Drho, Lambda);`   `dE_delta = h * delta * DtDrho;` |
 
 **Proposition**: $\nabla E(\rho)$ is Lipschitz continuous in $\rho$, i.e. 
 $$
@@ -184,6 +184,12 @@ Simple algebra shows that
 $$
 	p_L(y) = argmin_{x\in S_N^+(1)} \left\|x - \left(y - \frac{1}{L} \nabla f(y)\right)\right\|.
 $$
+
+Remark: Sometimes we use the "prox"(近端投影算子) 
+$$
+	p_L(y) = Prox_{\gamma g}(y - \gamma\nabla f(y)) = argmin_x \left\{g(x) + \frac{1}{2\gamma}\|x - \left(y - \gamma\nabla f(y)\right)\|^2\right\}
+$$
+When $g(x) = 1_{S_N^+(1)}(x)$, the above definition is equivalent. 
 
 **Algorithm 1.1**: ISTA with constant stepsize
 Step k: 
@@ -425,13 +431,71 @@ We can't get the spectral accuracy. A test via "plot\_spectral\_decay.m" shows t
 |$h\sum_{j=0}^{N-1} \frac{(D\rho)_j^2}{8\sqrt{\rho_j^2+\varepsilon^2}}$| $h \left[ D^T\frac{D\rho}{4\sqrt{\rho_j^2+\varepsilon^2}} - \frac{(D\rho)^2}{8(\rho^2+\varepsilon^2)} .* \frac{\rho}{\sqrt{\rho^2+\varepsilon^2}}\right]$ | `Drho = fourier_diff(rho, Lambda);`  `Grho = Drho ./ sqrt(rho.^2 + vep^2);` `DtGrho = fourier_diff_T(Grho, Lambda);` `dE_kin = h * (DtGrho / 4 - Grho.^2 .* rho ./ sqrt(rho.^2 + vep^2) / 8);` |
 
 ### Numerical tests with the new regularization
+$$
+	\frac{\nabla \rho}{\sqrt{\rho^2+\varepsilon^2}}
+$$
 $V(x)=\frac{x^2}{2}$, $\beta = 10$, $\delta = 10$
 
 |   | $h=1/2$ |$h = 1/2^2$|$h=1/2^3$|$h=1/2^4$| $h = 1/2^8$|
 |-------|-------|-------|-------|-------|-------|
-| $\varepsilon = 10^{-3}$ | 2.206905123052067 | 2.206845206955864 |  2.206845268472698 | 2.206845257098633
-|$ABS(E_h - E_{h/2})$ | 5.99E-5 | 6.15E-8 | 1.14E-8
+| $\varepsilon = 10^{-3}$ | 2.206905123052067 | 2.206845206955864 |  2.206845268472698 | 2.206845257098633 | 2.206845253364787
+|$ABS(E_h - E_{h/2})$ | 5.99E-5 | 6.15E-8 | 1.14E-8 | 3.73E-9
 ![decay](./Code-DensityFormulation/Figure/spectral_coeff_decay_reg1.png)
+
+#### regularization 2
+$$
+	|\nabla\sqrt{\rho+\varepsilon}|^2
+$$
+
+|   | $h=1/2$ |$h = 1/2^2$|$h=1/2^3$|$h=1/2^4$| $h = 1/2^8$|
+|-------|-------|-------|-------|-------|-------|
+| $\varepsilon = 10^{-3}$ |  | 2.204062728803032 |  2.204062800900729 | 2.204062789536930| 
+|$ABS(E_h - E_{h/2})$ | | 7.21E-8 | 1.14E-8
+
+#### regularization 3
+分段多项式逼近
+
+|   | $h=1/2$ |$h = 1/2^2$|$h=1/2^3$|$h=1/2^4$| $h = 1/2^8$|
+|-------|-------|-------|-------|-------|-------|
+| $\varepsilon = 10^{-3}$ |  2.207498378884970 |  2.207505243942035 |  2.207505773779581 | 2.207505256643723 | 
+|$ABS(E_h - E_{h/2})$ | 6.87E-6 | 5.30E-7|  5.17E-7
+
+#### 2025/05/23 
+We changed the FISTA to be FISTA_CD: 
+For $h = 1/2^8$, energy is 2.206845253364787
+
+
+平滑拼接不可取：导数计算中包含`1\sqrt(X)`导致爆炸
+```
+% 平滑拼接函数
+S = 0.5 * (1 + tanh((X - vep)/delta));
+dS = (1 - tanh((X - vep)/delta).^2) / (2*delta);
+```
+#### 2025/05/24
+引入高频限制
+$$
+	\alpha \int |\Delta \rho|^2 dx
+$$
+$\alpha = 10^{-8}$
+
+|  L=16 | $h=1$ |$h=1/2$ |$h = 1/2^2$|$h=1/2^3$|$h=1/2^4$|
+|-------|-------|-------|-------|-------|-------|
+| $\varepsilon = 10^{-3}$ | 2.207776525496256|2.206905123382969 | 2.206845207284629 | 2.206845268801452 | 2.206845257427393| 
+|$ABS(E_h - E_{h/2})$ | 8.71E-4 |5.99E-5 | 6.15E-8 |  1.14E-8
+| $\varepsilon = 10^{-4}$|    2.232640446063778 |2.228651260562834 | 2.228652496106124| 2.228652488427102|2.228652487289894 | 
+|$ABS(E_h - E_{h/2})$| 4.00E-3 |1.24E-6 | 7.68E-9 | 1.14E-9
+
+
+Figure when $\varepsilon=10^{-3}$
+![decay](./Code-DensityFormulation/Figure/test_E_high.png)
+
+
+|  L=32 | $h=1$ |$h=1/2$ |$h = 1/2^2$|$h=1/2^3$|$h=1/2^4$| $h=1/2^5$|
+|-------|-------|-------|-------|-------|-------|-------|
+| $\varepsilon = 10^{-3}$ | 2.207211074633144 | 2.206174196782344 | 2.206105039513607 | 2.206105141211133 |  2.206105139799338 | 2.206105139445950
+|$ABS(E_h - E_{h/2})$ | 1.04E-3 | 6.92E-5 | 1.02E-7 | 1.41E-9 | 3.53E-10
+![decay](./Code-DensityFormulation/Figure/test_L_32.png)
+注：计算区域影响尾端精度，猜测与周期边界条件有关。尾端精度大致与能量的最终精度一致。
 
 
 ## Future work
