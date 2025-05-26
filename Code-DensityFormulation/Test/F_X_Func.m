@@ -4,5 +4,8 @@ function[FX, dFX] = F_X_Func(X, vep)
 % dFX = (X>vep) ./ sqrt(X) / 2 ...
 %     + (X<=vep) .* (3/2 - X / vep) / sqrt(vep);
 
-FX = sqrt(X + vep);
-dFX = 1 ./ sqrt(X + vep) / 2;
+% FX = sqrt(X + vep);
+% dFX = 1 ./ sqrt(X + vep) / 2;
+
+FX = X; 
+dFX = ones(size(X));

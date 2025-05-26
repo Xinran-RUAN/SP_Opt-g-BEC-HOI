@@ -48,6 +48,7 @@ $$
 $$
 
 ### Details of the pseudospectral discretization
+### FFT
 For simplicity of notations, we use $\mu_l =\frac{2\pi l}{b-a}$. Since 
 $$
 	\rho(x) \approx \sum_{l=-\frac{N}{2}}^{\frac{N}{2}-1} \hat{\rho}_l e^{i\mu_l(x-a)}，
@@ -72,6 +73,7 @@ $$
 $$
 
 **Proposition 1**：If $\rho\in\mathbb{R}^N$, then $\hat{\rho}_{N-k} = \overline{\hat{\rho}}_k$. （共轭对称性）
+
 **Proof**: 
 $$
 	\hat{\rho}_{N-k} = \frac{1}{N} \sum_{j=0}^{N-1} \rho_j e^{-i \frac{2\pi j(N-k)}{N}} = \frac{1}{N} \sum_{j=0}^{N-1} \rho_j e^{i \frac{2\pi jk}{N}} = \overline{\hat{\rho}}_k.
@@ -170,6 +172,43 @@ $$
 \end{aligned}
 $$
 where $\|D\|_\infty = max_j \sum_{k=1}^N |D_{jk}|$.
+
+### DST
+We use $\nu_l =\frac{\pi l}{b-a}$. Since 
+$$
+	\rho(x) \approx \sum_{l=1}^{N-1} \hat{\rho}_l \sin(\nu_l(x-a))，
+$$
+the first derivatives at grid points can be computed as 
+$$
+	\frac{d \rho}{dx}(x) \approx \sum_{l=1}^{N-1} \nu_l\hat{\rho}_l \cos(\nu_l(x-a)).
+$$
+At grid points, 
+$$
+	\rho_j = \sum_{l=1}^{N-1} \hat{\rho}_l \sin\left(\frac{\pi l j}{N}\right), 
+	\quad 
+	\delta_x^s \rho_j = \sum_{l=1}^{N-1} \nu_l\hat{\rho}_l \cos\left(\frac{\pi l j}{N}\right).
+$$
+Conversely, using the orthogonality relation
+$$
+	\sum_{j=1}^{N-1} \sin\left(\frac{\pi l j}{N}\right) \sin\left(\frac{\pi m j}{N}\right) 
+$$
+$$
+	\hat{\rho}_l = .
+$$
+
+#### Relation with FFT
+The coefficients and the first derivative can be computed via an odd extension.
+
+`X_OddExt = [0; -X(end:-1:1); 0; X];`
+
+| FFT ($M=2N$) | DST |
+|-----------|-----------|
+| $\rho_j = \sum_{l=-\frac{M}{2}}^{\frac{M}{2}-1} \hat{\rho}_l e^{i\frac{2\pi l j}{N}} =  \sum_{l=-N}^{N-1} \hat{\rho}_l \left[\cos\left(\frac{\pi l j}{N}\right) + i \sin\left(\frac{\pi l j}{N}\right)\right]$ |$\rho_j = \sum_{l=1}^{N-1} \hat{\rho}_l^{(s)} \sin\left(\frac{\pi l j}{N}\right)$|
+
+Obviously, $\hat{\rho}_0 = \hat{\rho}_{-N} = 0$, $Re(\hat{\rho}_{l})=0$, which together with $\hat{\rho}_{l} = \overline{\hat{\rho}}_{-l}$ immediately implies that $\hat{\rho}_{-l} = -\hat{\rho}_{l}$.  
+$$
+	\rho_l^{(s)} = -2 Im(\hat{\rho}_{l}).
+$$
 
 ## ISTA/FISTA
 Key functions used in the algorithm:

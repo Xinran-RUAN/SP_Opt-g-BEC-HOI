@@ -1,10 +1,18 @@
 function [dX] = DST_diff(X, L)
+%%  odd extension
+    X_OddExt = OddExtension(X);
+
 %%
-    N = length(X);
-    mu = pi / L * (1:N);
-    mu = reshape(mu, size(X)); % Lambda与X形状保持一致
+    [m,n] = size(X);
+    if n == 1
+        N = m;
+        Lambda = 2 * pi * 1i / (2 * L) * [(0:N)'; (-N-1:-1)'];
+    else
+        N = n;
+        Lambda = 2 * pi * 1i / (2 * L) * [0:N, -N-1:-1];
+    end
+
 %%
-    X_hat = dst(X);
-    dX_hat = mu .* X_hat;
-    dX = idct(dX_hat);
+    dX_OddExt = fourier_diff(X_OddExt, Lambda);
+    dX = dX_OddExt(N+1:end); % N+1至2N+2: 比X多两个边界值，边界速度非0
 end

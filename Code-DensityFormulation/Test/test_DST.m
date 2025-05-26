@@ -1,0 +1,14 @@
+% test DST
+x = -2:0.01:2;
+% y = sin(4 * pi * x);
+%% test my_dst
+% y_hat = dst(y(2:end-1));
+% my_y_hat = my_dst(y(2:end-1));
+%% test DST_diff
+y = 4 - x.^2;
+dy = DST_diff(y(2:end-1), 4);
+dy_ex = -2 * x(2:end-1);
+
+figure(1)
+plot(x(2:end-1), dy, 'b-'); hold on;
+plot(x(2:end-1), dy_ex, 'r--'); hold off;
