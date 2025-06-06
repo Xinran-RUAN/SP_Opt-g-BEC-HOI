@@ -1,3 +1,5 @@
+%% 
+% 奇延拓（odd extension）虽然能实现快速正弦变换，但确实可能导致精度下降，尤其是在处理导数时。
 function [dX] = DST_diff(X, L)
 %%  odd extension
     X_OddExt = OddExtension(X);

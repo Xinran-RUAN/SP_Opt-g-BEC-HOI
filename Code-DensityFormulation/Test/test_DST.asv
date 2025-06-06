@@ -1,27 +1,20 @@
 % test DST
 x = (-2:0.01:2)';
-
-%% test my_dst
 y = sin(4 * pi * x);
-% y = 4 - x.^2;
-y_hat = dst(y(2:end-1)) * (2/(length(x)-1));
+%% test my_dst
+y_hat = dst(y(2:end-1));
 my_y_hat = my_dst(y(2:end-1));
 my_y_hat1 = dst1_scalar(y(2:end-1));
 my_y_hat2 = my_dst1(y(2:end-1));
 disp(max(abs(my_y_hat1 - my_y_hat)));
 disp(max(abs(my_y_hat1 - my_y_hat2)));
-% 结论：my_dst有明显误差，这表明奇延拓影响精度;对于y = 4 - x.^2，计算有误？？？
 %% test DST_diff
 y = 4 - x.^2;
-dy_ex = -2 * x(2:end-1);
-% y = sin(4 * pi * x);
-% dy_ex = 4 * pi * cos(4 * pi * x(2:end-1));
 dy = DST_diff(y(2:end-1), 4);
 dy1 = my_dst1_diff(y(2:end-1), 4);
-
-disp(max(abs(dy(2:end-1) - dy_ex)));
-disp(max(abs(dy1 - dy_ex)));
-% disp(max(abs(dy1 - dy(2:end-1))));
+dy_ex = -2 * x(2:end-1);
+disp(max(abs(dy - dy1)));
+disp(max(abs(my_y_hat1 - my_y_hat2)));
 
 % figure(1)
 % plot(x, dy, 'b-'); hold on;

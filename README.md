@@ -210,6 +210,8 @@ $$
 	\rho_l^{(s)} = -2 Im(\hat{\rho}_{l}).
 $$
 
+注：奇延拓（odd extension）虽然能实现快速正弦变换，但确实可能导致精度下降，尤其是在处理导数时。在拼接点处可能只有C_0连续。
+
 ## ISTA/FISTA
 Key functions used in the algorithm:
 
