@@ -543,6 +543,8 @@ Figure when $\varepsilon=10^{-3}$
 ![decay](./Code-DensityFormulation/Figure/test_L_32.png)
 注：计算区域影响尾端精度，猜测与周期边界条件有关。尾端精度大致与能量的最终精度一致。
 
+问题：猜测是因为在计算区域边界密度约为0，对能量精度影响较大，是否有办法解决这一问题？
+
 
 ## Future work
 
