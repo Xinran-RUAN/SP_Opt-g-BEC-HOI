@@ -16,5 +16,5 @@ function [dX] = DST_diff(X, L)
 
 %%
     dX_OddExt = fourier_diff(X_OddExt, Lambda);
-    dX = dX_OddExt(N+1:end); % N+1至2N+2: 比X多两个边界值，边界速度非0
+    dX = dX_OddExt(2:N+1); % N+1至2N+2: 比X多两个边界值，边界速度非0
 end
