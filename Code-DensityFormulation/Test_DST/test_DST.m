@@ -31,16 +31,16 @@ disp(max(abs(y2 - y)));
 %% test DST_diff
 % % 测试例子1
 % % 该测试例子的一阶导数不符合Neumann边界，无法用cos列表示，因此无法得到谱精度
-% y = x .* (4-x);
-% dy_ex = 4 - 2 * x;
-% dy_in_ex = 4 - 2 * x_in;
-% dy_h_ex = 4 - 2 * x_h; 
+y = x .* (4-x);
+dy_ex = 4 - 2 * x;
+dy_in_ex = 4 - 2 * x_in;
+dy_h_ex = 4 - 2 * x_h; 
 % % 测试例子2
 % % 即使是Neumann边界，高阶导数非Neumann边界也会导致无谱精度？？
-y = x.^2 .* (4-x).^2;
-dy_ex = 2 * x .* (4-x).^2 - 2 * x.^2 .* (4-x);
-dy_in_ex = 2 * x_in .* (4-x_in).^2 - 2 * x_in.^2 .* (4-x_in);
-dy_h_ex = 2 * x_h .* (4-x_h).^2 - 2 * x_h.^2 .* (4-x_h); 
+% y = x.^2 .* (4-x).^2;
+% dy_ex = 2 * x .* (4-x).^2 - 2 * x.^2 .* (4-x);
+% dy_in_ex = 2 * x_in .* (4-x_in).^2 - 2 * x_in.^2 .* (4-x_in);
+% dy_h_ex = 2 * x_h .* (4-x_h).^2 - 2 * x_h.^2 .* (4-x_h); 
 % % 测试例子3
 % y = sin(4 * pi * x);
 % dy_ex = 4 * pi * cos(4 * pi * x);
@@ -68,5 +68,9 @@ plot(dy_fft - dy_ex(1:end-1)) % 误差出现在边界处
 figure(2)
 plot(x, dy_ex, 'b-'); hold on;
 plot(x(1:end-1), dy_fft, 'r--'); hold off;
+
+figure(3)
+plot(x, dy_ex, 'b-'); hold on;
+plot(x(2:end-1), dy, 'r--'); hold off;
 
 

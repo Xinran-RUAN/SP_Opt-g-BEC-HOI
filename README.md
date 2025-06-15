@@ -213,8 +213,11 @@ $$
 注：奇延拓（odd extension）虽然能实现快速正弦变换，但确实可能导致精度下降，尤其是在处理导数时。在拼接点处可能只有C_0连续。
 
 注：“test\_DST.m”显示如下结论：
-1. 在计算 $\hat{\rho}$ 时，Matlab自带的dst.m与直接通过定义计算的my_dst1.m, dst1_scalar.m(非矩阵版本)一致，与通过奇延拓的FFT算法的结论也一致。
+
+1. 在计算 $\hat{\rho}$ 时，Matlab自带的dst.m与直接通过定义计算的my\_dst1.m, dst1\_scalar.m(非矩阵版本)一致，与通过奇延拓的FFT算法的结论也一致。
+
 2. 在计算一阶导数时，若非sin函数，边界往往有较大误差，且几乎无法消除，猜测为因为边界条件（Neumann BC）不满足导致的Gibbs现象。在半点计算也无法改善。但直接用FFT（不经过延拓）计算，比用DST方法在某些算例(算例2)情形下收敛更快。但FFT在算例1下又不收敛？？
+
 3. 查询之前的review参考文献，发现DST离散只用于了全空间的harmonic potential问题，而没有用于box potential问题。或许DST及FFT对于有界问题的表现不佳？？
 
 ## ISTA/FISTA
