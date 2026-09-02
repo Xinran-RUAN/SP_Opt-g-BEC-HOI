@@ -1,0 +1,12 @@
+# macOS and editor metadata
+.DS_Store
+*.asv
+*~
+
+# MATLAB transient/build output
+matlab_crash_dump.*
+java.log.*
+slprj/
+codegen/
+*.mex*
+
