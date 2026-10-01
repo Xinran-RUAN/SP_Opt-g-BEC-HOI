@@ -8,7 +8,7 @@ clearvars; clc;
 
 % ======================== paper configuration =========================
 epsilon = 1e-2;
-sigma_list = [1e-2, 1e-4, 1e-6];
+sigma_list = [0, 1e-2, 1e-4, 1e-6];
 beta = 10;
 delta = 10;
 mass = 1;
@@ -37,8 +37,12 @@ startup_HOI();
 
 output_folder = fullfile(root, 'results', 'figures');
 case_folder = fullfile(root, 'results', 'sigma_spectral_accuracy');
+paper_figure_folder = fullfile(root, 'figs');
+repository_root = fileparts(root);
+manuscript_figure_folder = fullfile(repository_root, 'manuscript', 'figs');
 if ~isfolder(output_folder), mkdir(output_folder); end
 if ~isfolder(case_folder), mkdir(case_folder); end
+if ~isfolder(paper_figure_folder), mkdir(paper_figure_folder); end
 
 state_figure_file = fullfile(output_folder, ...
     'sigma_effect_state_error_1d.fig');
@@ -48,8 +52,7 @@ energy_figure_file = fullfile(output_folder, ...
     'sigma_effect_energy_error_1d.fig');
 energy_eps_file = fullfile(output_folder, ...
     'sigma_effect_energy_error_1d.eps');
-data_file = fullfile(output_folder, ...
-    'sigma_effect_spectral_accuracy_1d_data.mat');
+data_file = fullfile(root, 'results', 'sigma_effect_with_sigma0.mat');
 
 validateMeshes(N_list, N_ref);
 solve_N = [N_list, N_ref];
@@ -78,11 +81,12 @@ template.V = @(x) model.HarmonicCInfPeriodicPotential(x, L, R0, R1);
 % use; the pre-existing sigma=1e-4 file is deliberately listed so that an
 % incompatible periodic-cosine trap is diagnosed and rejected.
 preferred_files = cell(size(sigma_list));
-preferred_files{1} = fullfile(root, 'results', 'potential_mesh', ...
-    'potential_mesh_inline_p_sigma_sigma_1em02_Nref8192_eps_1em02.mat');
+preferred_files{1} = '';
 preferred_files{2} = fullfile(root, 'results', 'potential_mesh', ...
+    'potential_mesh_inline_p_sigma_sigma_1em02_Nref8192_eps_1em02.mat');
+preferred_files{3} = fullfile(root, 'results', 'potential_mesh', ...
     'potential_mesh_inline_p_sigma_sigma_1em04_Nref8192_eps_1em02.mat');
-preferred_files{3} = '';
+preferred_files{4} = '';
 
 case_data = cell(numel(sigma_list), 1);
 for sigma_index = 1:numel(sigma_list)
@@ -169,11 +173,22 @@ metadata.energy_error_definition = ...
 save(data_file, 'sigma_list', 'N_list', 'N_ref', ...
     'state_error_curves', 'energy_error_curves', 'final_pg_curves', ...
     'state_rate_curves', 'energy_rate_curves', 'reference_pg', ...
-    'labels', 'metadata', 'source_files', 'certified', '-v7.3');
+    'labels', 'metadata', 'source_files', 'certified', 'case_data', ...
+    '-v7.3');
 
 makeSeparateFigures(N_list, sigma_list, state_error_curves, ...
     energy_error_curves, state_figure_file, state_eps_file, ...
     energy_figure_file, energy_eps_file);
+syncFigureFiles({state_figure_file, state_eps_file, ...
+    replace(state_eps_file, '.eps', '.png'), energy_figure_file, ...
+    energy_eps_file, replace(energy_eps_file, '.eps', '.png')}, ...
+    paper_figure_folder);
+if isfolder(manuscript_figure_folder)
+    syncFigureFiles({state_eps_file, ...
+        replace(state_eps_file, '.eps', '.png'), energy_eps_file, ...
+        replace(energy_eps_file, '.eps', '.png')}, ...
+        manuscript_figure_folder);
+end
 
 fprintf('\nSigma effect on Fourier spatial accuracy\n');
 fprintf('  epsilon=%g, beta=%g, delta=%g, L=%g, Nref=%d\n', ...
@@ -323,11 +338,6 @@ end
 end
 
 function config = makeConfig(N, sigma, template)
-p_sigma = @(rho) rho .^ 2 ./ (hypot(rho, sigma) + sigma);
-dp_sigma = @(rho) rho ./ hypot(rho, sigma);
-d2p_sigma = @(rho) ...
-    (sigma ./ hypot(rho, sigma)) .^ 2 ./ hypot(rho, sigma);
-
 config = experiments.DefaultConfig();
 config.parameters.beta = template.beta;
 config.parameters.delta = template.delta;
@@ -340,15 +350,25 @@ config.fisher_regularization.s_epsilon = template.s_epsilon;
 config.fisher_regularization.ds_epsilon = template.ds_epsilon;
 config.fisher_regularization.d2s_epsilon = template.d2s_epsilon;
 config.fisher_regularization.label = template.fisher_label;
-config.potential_regularization.name = 'inline_fixed_sigma';
-config.potential_regularization.sigma = sigma;
-config.potential_regularization.p_sigma = p_sigma;
-config.potential_regularization.dp_sigma = dp_sigma;
-config.potential_regularization.d2p_sigma = d2p_sigma;
-config.potential_regularization.label = sprintf( ...
-    'p_sigma(rho)=sqrt(rho^2+sigma^2)-sigma, sigma=%.3e', sigma);
-config.potential_regularization.prox_type = 'generic_convex';
-config.potential_regularization.convexity_tol = 1e-14;
+if sigma == 0
+    % Use the exact unsmoothed linear potential contribution.  In
+    % particular, do not evaluate the square-root formula at sigma=0,
+    % where its derivative representation is ambiguous at vacuum.
+    config.potential_regularization = src.potential.MakeLinear();
+else
+    config.potential_regularization.name = 'inline_fixed_sigma';
+    config.potential_regularization.sigma = sigma;
+    config.potential_regularization.p_sigma = @(rho) ...
+        rho .^ 2 ./ (hypot(rho, sigma) + sigma);
+    config.potential_regularization.dp_sigma = @(rho) ...
+        rho ./ hypot(rho, sigma);
+    config.potential_regularization.d2p_sigma = @(rho) ...
+        (sigma ./ hypot(rho, sigma)) .^ 2 ./ hypot(rho, sigma);
+    config.potential_regularization.label = sprintf( ...
+        'p_sigma(rho)=sqrt(rho^2+sigma^2)-sigma, sigma=%.3e', sigma);
+    config.potential_regularization.prox_type = 'generic_convex';
+    config.potential_regularization.convexity_tol = 1e-14;
+end
 config.trapping_potential.V = template.V;
 config.trapping_potential.label = template.potential_label;
 config.trapping_potential.mode = template.potential_choice;
@@ -563,6 +583,8 @@ set(stateFigure, 'PaperPositionMode', 'auto', 'Visible', 'on');
 savefig(stateFigure, stateFigFile);
 set(stateFigure, 'Visible', 'off');
 print(stateFigure, stateEpsFile, '-depsc2', '-vector');
+exportgraphics(stateFigure, replace(stateEpsFile, '.eps', '.png'), ...
+    'Resolution', 300);
 close(stateFigure);
 
 energyFigure = figure('Visible', 'off', 'Color', 'w', ...
@@ -593,10 +615,16 @@ set(energyFigure, 'PaperPositionMode', 'auto', 'Visible', 'on');
 savefig(energyFigure, energyFigFile);
 set(energyFigure, 'Visible', 'off');
 print(energyFigure, energyEpsFile, '-depsc2', '-vector');
+exportgraphics(energyFigure, replace(energyEpsFile, '.eps', '.png'), ...
+    'Resolution', 300);
 close(energyFigure);
 end
 
 function label = sigmaLabel(sigma)
+if sigma == 0
+    label = '$\sigma=0$';
+    return;
+end
 exponent = round(log10(sigma));
 if abs(sigma - 10 ^ exponent) <= 100 * eps(max(1, sigma))
     label = sprintf('$\\sigma=10^{%d}$', exponent);
@@ -624,6 +652,17 @@ tf = isscalar(a) && isscalar(b) && isfinite(a) && isfinite(b) ...
     && abs(a - b) <= 100 * eps(max([1, abs(a), abs(b)]));
 end
 
+function syncFigureFiles(files, destination)
+for index = 1:numel(files)
+    [~, name, extension] = fileparts(files{index});
+    copyfile(files{index}, fullfile(destination, [name, extension]));
+end
+end
+
 function tag = numberTag(value)
+if value == 0
+    tag = '0';
+    return;
+end
 tag = strrep(strrep(sprintf('%.0e', value), '-', 'm'), '+', 'p');
 end

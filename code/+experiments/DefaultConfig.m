@@ -43,6 +43,9 @@ config.solver.final_pg_tol = 1e-12;
 config.solver.fallback_fista_iter = 0;
 config.solver.energy_tol = 1e-14;
 config.solver.max_iter = 200000;
+% Optional canonical solver wall-clock limit.  Infinite by default, so
+% existing production runs retain their iteration/stationarity behavior.
+config.solver.time_limit = inf;
 config.solver.a = 4;
 config.solver.feasibility_tol = 1e-13;
 config.solver.display = true;

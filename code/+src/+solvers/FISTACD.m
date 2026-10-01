@@ -56,7 +56,8 @@ for iteration = 1:mainIterationLimit
     extrapolated = rho + alpha * (rho - rhoPrevious);
     restarted = false;
 
-    if usesPotentialProx(problem, solver) && any(extrapolated < 0)
+    if requiresNonnegativeExtrapolation(problem, solver) ...
+            && any(extrapolated < 0)
         extrapolated = rho;
         restarted = true;
     elseif any(extrapolated < -solver.feasibility_tol)
@@ -206,14 +207,22 @@ for iteration = 1:mainIterationLimit
             converged = true;
             stopReason = 'final_pg_tolerance';
             break;
+        elseif history.elapsed_time(iteration) >= solver.time_limit
+            stopReason = 'time_limit';
+            break;
         elseif stopAtEnergyHandoff && handoffDetected
             requestPolish = true;
             stopReason = 'switch_to_kkt_polish';
             break;
         end
-    elseif residualChecked && state.pg_residual <= solver.pg_tol
-        converged = true;
-        stopReason = 'pg_tolerance';
+    else
+        if residualChecked && state.pg_residual <= solver.pg_tol
+            converged = true;
+            stopReason = 'pg_tolerance';
+        elseif history.elapsed_time(iteration) >= solver.time_limit
+            stopReason = 'time_limit';
+            break;
+        end
     end
 end
 
@@ -296,6 +305,8 @@ diagnostics.failure_message = '';
 diagnostics.restarts = restartCount;
 diagnostics.restart_count = restartCount;
 diagnostics.elapsed_time = toc(startTime);
+diagnostics.time_limit = solver.time_limit;
+diagnostics.time_limit_reached = strcmp(stopReason, 'time_limit');
 diagnostics.energy_plateau = energyPlateauDetected;
 diagnostics.stop_at_energy_handoff = stopAtEnergyHandoff;
 diagnostics.handoff_detected = handoffCaptured;
@@ -425,6 +436,15 @@ end
 function active = usesPotentialProx(problem, solver)
 active = ~entropyActive(problem) && isfield(solver, 'splitting') ...
     && strcmpi(solver.splitting, 'potential_prox');
+end
+
+function active = requiresNonnegativeExtrapolation(problem, solver)
+% Both potential splittings evaluate p_sigma only on its physical domain.
+% This keeps the smooth-potential experiment on the same restart path as
+% production potential-prox FISTA without changing the production default.
+active = ~entropyActive(problem) && isfield(solver, 'splitting') ...
+    && ismember(lower(char(solver.splitting)), ...
+    {'potential_prox', 'smooth_potential'});
 end
 
 function active = entropyActive(problem)

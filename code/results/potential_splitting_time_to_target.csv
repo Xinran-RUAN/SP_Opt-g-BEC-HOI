@@ -1,0 +1,5 @@
+sigma,splitting,time_pg_1e-4,time_pg_1e-5,time_pg_1e-6,termination_reason,final_time,final_pg
+0.0001,prox,69.95,100.50,141.56,stationarity_reached,141.593678459,9.84214529998256e-07
+0.0001,smooth,212.63,229.17,416.13,stationarity_reached,416.159196667,9.92918573010474e-07
+1e-06,prox,74.91,99.59,167.88,stationarity_reached,167.910025833,9.89510608979025e-07
+1e-06,smooth,275.53,585.17,>900,time_limit,900.0329705,5.34114939688946e-06
